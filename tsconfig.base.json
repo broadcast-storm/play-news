@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@components/*": [
+        "components/*"
+      ],
+      "@pages/*": [
+        "pages/*"
+      ],
+      "@config/*": [
+        "config/*"
+      ],
+      "@img/*": [
+        "img/*"
+      ],
+      "@icons/*": [
+        "icons/*"
+      ],
+      "@constantcss/*": [
+        "constantcss/*"
+      ],
+      "@data/*": [
+        "data/*"
+      ],
+      "@store/*": [
+        "store/*"
+      ],
+      "@reducers/*": [
+        "store/reducers/*"
+      ],
+      "@actions/*": [
+        "store/actions/*"
+      ],
+      "@textures/*": [
+        "textures/*"
+      ],
+      "@interfaces/*": [
+        "interfaces/*"
+      ]
+    }
+  }
+}
