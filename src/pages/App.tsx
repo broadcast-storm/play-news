@@ -6,6 +6,7 @@ import { Route, Switch } from 'react-router-dom';
 import Info from '@pages/Info';
 import Main from '@pages/Main';
 import { Layout } from 'antd';
+import Footer from '@components/Footer';
 
 const App: React.FC = () => {
    const { Content } = Layout;
@@ -20,6 +21,7 @@ const App: React.FC = () => {
                </Switch>
             </Content>
          </Layout>
+         <Footer/>
       </>
    );
 };

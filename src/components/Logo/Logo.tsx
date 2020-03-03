@@ -5,7 +5,7 @@ import styles from './styles.module.scss';
 import classNames from 'classnames';
 
 type LogoProps = {
-   className: string | null
+   className?: string | null
 }
 
 const Logo: React.FC<LogoProps>= ({className}) => {

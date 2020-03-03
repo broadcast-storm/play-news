@@ -8,7 +8,7 @@
   z-index: 2000;
 
   &__links{
-    flex: 1 1 auto;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -16,15 +16,16 @@
 
   &__empty-div{
     display: none;
-    flex: 1 1 auto;
+    flex: 1;
   }
 
   &__menu-btn{
-    flex: 1 1 auto;
+    flex: 1;
+    justify-content: flex-end ;
     display: none;
     background: transparent;
     border: none;
-    padding:0;
+    padding: 0 8px 0 0;
 
     img {
       height: 30px;
@@ -40,7 +41,7 @@
       display: none;
     }
     &__menu-btn, &__empty-div{
-      display: block;
+      display: flex;
     }
 
   }

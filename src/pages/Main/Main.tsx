@@ -40,11 +40,14 @@ const Main: React.FC = () => {
    };
 
    return (
-      <div className="container mt-3">
-         <h1>Главная страница</h1>
-         <Form onAdd={addHandler} />
-         <TodoList todos={todos} onToggle={toggleHandler} onRemove={removeHandler} />
-      </div>
+      <>
+         <div className="container mt-3">
+            <h1>Главная страница</h1>
+            <Form onAdd={addHandler} />
+            <TodoList todos={todos} onToggle={toggleHandler} onRemove={removeHandler} />
+         </div>
+
+      </>
    );
 };
 
