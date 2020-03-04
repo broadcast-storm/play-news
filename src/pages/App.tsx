@@ -17,13 +17,7 @@ const App: React.FC = () => {
                   <Route exact path={Routes.mainPage} component={News} />
                   <Route path={Routes.infoPage} component={Info} />
                </Switch>
-<<<<<<< Updated upstream
-            </Content>
-         </Layout>
-=======
-            </div>
          <Footer/>
->>>>>>> Stashed changes
       </>
    );
 };
