@@ -62,12 +62,9 @@
     color: #ffffff;
   }
 
-  &__link:hover{
+  &__link:hover, .link-active{
     color: #F2CB04;
-  }
-
-  .link-active{
-    color: #F2CB04;
+    text-decoration: none;
   }
 
   &__profile{
@@ -75,7 +72,7 @@
   }
 
   &__logo{
-    flex: 1 1 auto;
+    flex: 1;
   }
 
 }

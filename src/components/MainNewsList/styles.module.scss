@@ -1,0 +1,53 @@
+.news-list{
+  padding: 5px;
+  background-color: white;
+}
+.row{
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.send-new, .send-new:hover{
+  color: gray;
+  text-decoration: none;
+}
+
+.news-type{
+  background: transparent;
+  border: none;
+  color: gray;
+}
+.news-type:focus, .news-type:active{
+  outline: none;
+}
+
+.news-type:hover{
+  font-weight: bolder;
+}
+
+.news-type:disabled{
+  color: black;
+  font-weight: 600;
+  padding-bottom: 2px;
+  border-bottom: 2px solid #F2CB04;
+}
+
+.page-name{
+  color: #F2CB04;
+  font-weight: bolder;
+}
+
+.search-container{
+  height: 30px;
+  border-bottom: 2px solid black;
+  &__input{
+    border: none;
+  }
+  &__input:focus, &__input:active, &__btn:focus, &__btn:active{
+    outline: none;
+  }
+  &__btn{
+    background: transparent;
+    border: none;
+  }
+}

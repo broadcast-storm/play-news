@@ -1,0 +1,11 @@
+.news{
+  display: flex;
+  &__main-container{
+    flex: 2;
+    padding: 5px;
+  }
+  &__side-container{
+    flex: 1;
+    padding: 5px;
+  }
+}
