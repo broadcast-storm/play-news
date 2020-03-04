@@ -22,25 +22,26 @@ const MainNewsList: React.FC<MainNewsListProps>= ({className}) => {
 
    return (
       <div className={styles['news-list']}>
-         <div className={styles['row']}>
-            <div  className={styles['news-type-change']}>
-               <button className={styles['news-type']}
-                       disabled={type === 'editors' }
-                       onClick={() => clickHandler('editors')}>
-                  редакционное
-               </button>
-               <span>&nbsp;/&nbsp;</span>
-               <button className={styles['news-type']}
-                       disabled={type === 'readers' }
-                       onClick={() => clickHandler('readers')}>
-                  читательское
-               </button>
+            <div className={styles['row']}>
+               <div  className={styles['news-type-change']}>
+                  <button className={styles['news-type']}
+                          disabled={type === 'editors' }
+                          onClick={() => clickHandler('editors')}>
+                     редакционное
+                  </button>
+                  <span>&nbsp;/&nbsp;</span>
+                  <button className={styles['news-type']}
+                          disabled={type === 'readers' }
+                          onClick={() => clickHandler('readers')}>
+                     читательское
+                  </button>
+               </div>
+
+               <NavLink to={'/send'} className={styles['send-new']}>
+                  прислать новость <img src={SendImg} alt="send"/>
+               </NavLink>
             </div>
 
-            <NavLink to={'/send'} className={styles['send-new']}>
-               прислать новость <img src={SendImg} alt="send"/>
-            </NavLink>
-         </div>
          <div className={styles['row']}>
             <h2 className={styles['page-name']}>Новости</h2>
             <div className={styles['search-container']}>

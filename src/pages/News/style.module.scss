@@ -1,11 +1,22 @@
 .news{
   display: flex;
   &__main-container{
-    flex: 2;
-    padding: 5px;
+    flex: 75%;
+    padding: 5px 5px 5px 0;
   }
   &__side-container{
-    flex: 1;
-    padding: 5px;
+    flex: 25%;
+    padding: 5px 0 5px 5px;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    &__main-container{
+      flex: 100%;
+    }
+    &__side-container{
+      flex: 100%;
+    }
   }
 }
