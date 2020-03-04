@@ -25,6 +25,7 @@
 
   .links__item:hover, .link-active{
     color: #F2CB04;
+    text-decoration: none;
   }
 
   &__logo{
@@ -50,12 +51,14 @@
     }
 
     .subscribe__btn{
+      color: white;
       width: 120px;
       height: 37px;
       border: none;
       background-color: #dbb504;
       padding: 0 10px;
       text-transform: uppercase;
+      text-shadow: 1px 1px 1px gray;
     }
 
     .subscribe__btn:active, .subscribe__btn:focus{
