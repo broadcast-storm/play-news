@@ -1,25 +1,71 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+
+import "firebase/auth";
+import "firebase/database";
+import { firebaseInit } from "@actions/firebase";
+import { connect } from "react-redux";
 
 import Navbar from '@components/Navbar';
 import Routes from '@config/routes';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, withRouter } from 'react-router-dom';
+
 import Info from '@pages/Info';
 import News from '@pages/News';
+import Login from '@pages/Login';
+
 import Footer from '@components/Footer';
 
-const App: React.FC = () => {
+import styles from './style.module.scss';
+
+
+// @ts-ignore
+const App: React.FC = ({location}) => {
+   useEffect(() => {
+      firebaseInit();
+   }, []);
+
    return (
-      <>
-            <Navbar />
-            <div style={{ maxWidth: '1140px', margin: '70px auto 0 auto', minHeight:'30vh' }}>
+      <div className={
+         location.pathname !== Routes.signupPage
+         && location.pathname !== Routes.loginPage  ?
+            styles['background'] : styles['dark-background']
+      }
+      >
+         <Switch>
+            <Route exact path={Routes.loginPage} render={() => null}/>
+            <Route exact path={Routes.signupPage} render={() => null}/>
+            <Route path={Routes.mainPage} component={Navbar} />
+         </Switch>
+
+            <div className={styles['container']}>
                <Switch>
                   <Route exact path={Routes.mainPage} component={News} />
                   <Route path={Routes.infoPage} component={Info} />
+                  <Route path={Routes.loginPage} component={Login} />
                </Switch>
             </div>
-         <Footer/>
-      </>
+
+         <Switch>
+            <Route exact path={Routes.loginPage} render={() => null}/>
+            <Route exact path={Routes.signupPage} render={() => null}/>
+            <Route path={Routes.mainPage} component={Footer} />
+         </Switch>
+      </div>
    );
 };
 
-export default App;
+// @ts-ignore
+const mapStateToProps = ({ firebase }) => {
+   return {
+      ...firebase
+   };
+};
+
+const mapDispatchToProps = (dispatch: (arg0: (dispatch: any, getState: any) => Promise<void>) => any) => {
+   return {
+      firebaseInit: () => dispatch(firebaseInit())
+   };
+};
+
+// @ts-ignore
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

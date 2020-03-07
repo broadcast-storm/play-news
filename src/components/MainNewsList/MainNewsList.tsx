@@ -4,6 +4,8 @@ import styles from './styles.module.scss';
 import ListItem from './ListItem';
 import SendImg from '@img/news/sendNews.png';
 import SearchImg from '@img/news/search.png';
+
+import Routes from '@config/routes';
 import classNames from 'classnames';
 
 import  {NewsArray} from '../../mocks/index';

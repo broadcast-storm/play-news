@@ -1,7 +1,13 @@
 .logo{
   display: flex;
   justify-content: center;
+  vertical-align: center;
+  height: 40px;
   .logo__img{
-    width: 160px;
+    height: 100%;
   }
+}
+
+.logo:active, .logo:focus{
+  outline: none;
 }

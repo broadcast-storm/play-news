@@ -1,5 +1,7 @@
 export default {
   mainPage: "/",
-  infoPage: "/info"
+  infoPage: "/info",
+  loginPage: '/login',
+  signupPage: '/signup'
 
 };
