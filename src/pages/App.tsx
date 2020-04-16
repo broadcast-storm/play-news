@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 
-import "firebase/auth";
-import "firebase/database";
-import { firebaseInit } from "@actions/firebase";
-import { connect } from "react-redux";
+import 'firebase/auth';
+import 'firebase/database';
+import { firebaseInit } from '@actions/firebase';
+import { connect } from 'react-redux';
 
 import Navbar from '@components/Navbar';
 import Routes from '@config/routes';
@@ -15,39 +15,41 @@ import Login from '@pages/Login';
 
 import Footer from '@components/Footer';
 
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+
 import styles from './style.module.scss';
 
-
 // @ts-ignore
-const App: React.FC = ({location}) => {
+const App: React.FC = ({ location }) => {
    useEffect(() => {
       firebaseInit();
    }, []);
 
    return (
-      <div className={
-         location.pathname !== Routes.signupPage
-         && location.pathname !== Routes.loginPage  ?
-            styles['background'] : styles['dark-background']
-      }
-      >
+      <div
+         className={
+            location.pathname !== Routes.signupPage && location.pathname !== Routes.loginPage
+               ? styles['background']
+               : styles['dark-background']
+         }>
          <Switch>
-            <Route exact path={Routes.loginPage} render={() => null}/>
-            <Route exact path={Routes.signupPage} render={() => null}/>
+            <Route exact path={Routes.loginPage} render={() => null} />
+            <Route exact path={Routes.signupPage} render={() => null} />
             <Route path={Routes.mainPage} component={Navbar} />
          </Switch>
 
-            <div className={styles['container']}>
-               <Switch>
-                  <Route exact path={Routes.mainPage} component={News} />
-                  <Route path={Routes.infoPage} component={Info} />
-                  <Route path={Routes.loginPage} component={Login} />
-               </Switch>
-            </div>
+         <div className={styles['container']}>
+            <Switch>
+               <Route exact path={Routes.mainPage} component={News} />
+               <Route path={Routes.infoPage} component={Info} />
+               <Route path={Routes.loginPage} component={Login} />
+            </Switch>
+         </div>
 
          <Switch>
-            <Route exact path={Routes.loginPage} render={() => null}/>
-            <Route exact path={Routes.signupPage} render={() => null}/>
+            <Route exact path={Routes.loginPage} render={() => null} />
+            <Route exact path={Routes.signupPage} render={() => null} />
             <Route path={Routes.mainPage} component={Footer} />
          </Switch>
       </div>
@@ -61,7 +63,9 @@ const mapStateToProps = ({ firebase }) => {
    };
 };
 
-const mapDispatchToProps = (dispatch: (arg0: (dispatch: any, getState: any) => Promise<void>) => any) => {
+const mapDispatchToProps = (
+   dispatch: (arg0: (dispatch: any, getState: any) => Promise<void>) => any
+) => {
    return {
       firebaseInit: () => dispatch(firebaseInit())
    };

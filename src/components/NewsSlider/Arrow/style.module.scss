@@ -1,0 +1,41 @@
+.arrow {
+   position: absolute;
+   top: 50%;
+   right: -40px;
+   margin-top: -25px;
+   width: 50px;
+   height: 50px;
+   border: none;
+   background: transparent;
+   cursor: pointer;
+   z-index: 300;
+   padding: 5px;
+
+   img {
+      width: 100%;
+      height: 100%;
+   }
+}
+
+.arrow:focus,
+.arrow:active {
+   outline: none;
+}
+
+.prev {
+   left: -40px;
+   transform: scale(-1, 1);
+}
+
+@media (max-width: 440px) {
+   .arrow {
+      top: 50%;
+      margin-top: -15px;
+      right: 20px;
+   }
+
+   .prev {
+      right: auto;
+      left: 20px;
+   }
+}
