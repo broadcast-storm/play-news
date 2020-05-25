@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 
 import Routes from '@config/routes';
 
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, withRouter } from 'react-router-dom';
 
 import Logo from '@components/Logo';
 
@@ -11,7 +11,15 @@ import styles from './style.module.scss';
 
 import { Link, NavLink } from 'react-router-dom';
 
-import { doSignInWithEmailAndPassword, doCreateUserWithEmailAndPassword } from '@actions/firebase';
+import { Alert } from 'react-bootstrap';
+
+import { CircleSpinner } from 'react-spinners-kit';
+
+import {
+   doSignInWithEmailAndPassword,
+   doCreateUserWithEmailAndPassword,
+   doPasswordReset
+} from '@actions/firebase';
 import Vk from '@img/login/vk.png';
 import Facebook from '@img/login/facebook.png';
 import Twitter from '@img/login/twitter.png';
@@ -20,12 +28,33 @@ import Tel from '@img/login/telegram.png';
 type LoginProps = {
    doSignInWithEmailAndPassword: any;
    doCreateUserWithEmailAndPassword: any;
+   doPasswordReset: any;
+   isLoadingSignIn: boolean;
+   errorSignIn: any;
+   location: any;
 };
 
 const Login: React.FC<LoginProps> = ({
    doSignInWithEmailAndPassword,
-   doCreateUserWithEmailAndPassword
+   doCreateUserWithEmailAndPassword,
+   doPasswordReset,
+   errorSignIn,
+   isLoadingSignIn,
+   location
 }) => {
+   useEffect(() => {
+      if (errorSignIn !== null) {
+         setShow(true);
+      }
+   }, [errorSignIn]);
+
+   useEffect(() => {
+      setShow(false);
+   }, [location.pathname]);
+
+   const [passwordsCheckWrong, setPasswordsCheckWrong] = useState(false);
+
+   const [show, setShow] = useState(false);
    // FOR LOGIN
    const [email, setEmail] = useState<string>('');
    const [password, setPassword] = useState<string>('');
@@ -49,11 +78,17 @@ const Login: React.FC<LoginProps> = ({
 
    const forgotPasswFunc = (e: any) => {
       e.preventDefault();
+      doPasswordReset(emailForgotPassw);
    };
 
    const registrationFunc = (e: any) => {
       e.preventDefault();
-      doCreateUserWithEmailAndPassword(login, name, surname, emailReg, passwordReg);
+      if (passwordReg === passwordRegCheck) {
+         doCreateUserWithEmailAndPassword(login, name, surname, emailReg, passwordReg);
+      } else {
+         setPasswordsCheckWrong(true);
+         setShow(true);
+      }
    };
 
    const adminFunc = (e: any) => {
@@ -63,7 +98,17 @@ const Login: React.FC<LoginProps> = ({
    return (
       <div className={styles['login-page']}>
          <Logo className={styles['login-page__big-logo']} />
-
+         {show ? (
+            <Alert
+               variant="danger"
+               onClose={() => {
+                  setShow(false);
+                  if (passwordsCheckWrong) setPasswordsCheckWrong(false);
+               }}
+               dismissible>
+               <p>{passwordsCheckWrong ? 'Не совпадают введёные пароли' : errorSignIn}</p>
+            </Alert>
+         ) : null}
          <Switch>
             <Route
                exact
@@ -73,6 +118,8 @@ const Login: React.FC<LoginProps> = ({
                      <form className={styles['login-page__login-form']} onSubmit={loginFunc}>
                         <input
                            type="email"
+                           pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                           title="example@mail.ru"
                            className={styles['login-from__input']}
                            placeholder={'E-mail'}
                            required
@@ -86,9 +133,14 @@ const Login: React.FC<LoginProps> = ({
                            required
                            value={password}
                            onChange={(e) => setPassword(e.target.value)}
+                           minLength={8}
                         />
                         <button type={'submit'} className={styles['login-form__btn']}>
-                           Войти
+                           {!isLoadingSignIn ? (
+                              'Войти'
+                           ) : (
+                              <CircleSpinner size={30} color="#182126" />
+                           )}
                         </button>
                      </form>
                      <span>Войти через социальные сети</span>
@@ -126,11 +178,13 @@ const Login: React.FC<LoginProps> = ({
                      <form className={styles['login-page__login-form']} onSubmit={forgotPasswFunc}>
                         <input
                            type="email"
+                           pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                           title="example@mail.ru"
                            className={styles['login-from__input']}
                            placeholder={'E-mail'}
                            required
-                           value={email}
-                           onChange={(e) => setEmail(e.target.value)}
+                           value={emailForgotPassw}
+                           onChange={(e) => setEmailForgotPassw(e.target.value)}
                         />
                         <button type={'submit'} className={styles['login-form__btn']}>
                            Отправить запрос
@@ -180,6 +234,8 @@ const Login: React.FC<LoginProps> = ({
                         />
                         <input
                            type="email"
+                           pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                           title="example@mail.ru"
                            className={styles['login-from__input']}
                            placeholder={'E-mail'}
                            required
@@ -193,6 +249,9 @@ const Login: React.FC<LoginProps> = ({
                            required
                            value={passwordReg}
                            onChange={(e) => setPasswordReg(e.target.value)}
+                           minLength={8}
+                           pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*"
+                           title="Минимум 8 символов, одна цифра, одна буква в верхнем регистре и одна в нижнем"
                         />
                         <input
                            type="password"
@@ -201,9 +260,16 @@ const Login: React.FC<LoginProps> = ({
                            required
                            value={passwordRegCheck}
                            onChange={(e) => setPasswordRegCheck(e.target.value)}
+                           minLength={8}
+                           pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*"
+                           title="Минимум 8 символов, одна цифра, одна буква в верхнем регистре и одна в нижнем"
                         />
                         <button type={'submit'} className={styles['login-form__btn']}>
-                           Зарегистрироваться
+                           {!isLoadingSignIn ? (
+                              'Зарегистрироваться'
+                           ) : (
+                              <CircleSpinner size={30} color="#182126" />
+                           )}
                         </button>
                      </form>
 
@@ -243,6 +309,8 @@ const Login: React.FC<LoginProps> = ({
                         <br />
                         <input
                            type="email"
+                           pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                           title="example@mail.ru"
                            className={styles['login-from__input']}
                            placeholder={'E-mail'}
                            required
@@ -256,9 +324,14 @@ const Login: React.FC<LoginProps> = ({
                            required
                            value={passwordAdmin}
                            onChange={(e) => setPasswordAdmin(e.target.value)}
+                           minLength={8}
                         />
                         <button type={'submit'} className={styles['login-form__btn']}>
-                           Войти
+                           {!isLoadingSignIn ? (
+                              'Войти'
+                           ) : (
+                              <CircleSpinner size={30} color="#182126" />
+                           )}
                         </button>
                      </form>
 
@@ -278,10 +351,18 @@ const Login: React.FC<LoginProps> = ({
    );
 };
 
+// @ts-ignore
+const mapStateToProps = ({ firebase }) => {
+   return {
+      ...firebase
+   };
+};
+
 const mapDispatchToProps = (dispatch: any) => {
    return {
       doSignInWithEmailAndPassword: (email: string, password: string) =>
          dispatch(doSignInWithEmailAndPassword(email, password)),
+      doPasswordReset: (email: string) => dispatch(doPasswordReset(email)),
       doCreateUserWithEmailAndPassword: (
          login: string,
          name: string,
@@ -291,5 +372,5 @@ const mapDispatchToProps = (dispatch: any) => {
       ) => dispatch(doCreateUserWithEmailAndPassword(login, name, surname, email, password))
    };
 };
-
-export default connect(null, mapDispatchToProps)(Login);
+// @ts-ignore
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Login));

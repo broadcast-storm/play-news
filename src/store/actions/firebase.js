@@ -4,6 +4,9 @@ import 'firebase/firestore';
 
 const LOADING = 'LOADING';
 const LOADING_SMALL = 'LOADING_SMALL';
+const SIGNIN_LOADING_BEGIN = 'SIGNIN_LOADING_BEGIN';
+const SIGNIN_LOADING_END = 'SIGNIN_LOADING_END';
+const SIGNIN_ERROR = 'SIGNIN_ERROR';
 const ADD_REMIND = 'ADD_REMIND';
 const FETCH_REMINDS = 'FETCH_REMINDS';
 const DELETE_REMIND = 'DELETE_REMIND';
@@ -11,34 +14,6 @@ const ADD_NOTE = 'ADD_NOTE';
 const FETCH_NOTES = 'FETCH_NOTES';
 const DELETE_NOTE = 'DELETE_NOTE';
 const EDIT_NOTE = 'EDIT_NOTE';
-
-// export const firebaseMiddleware = store => next => action => {
-//   const actionWith = (type, payload) => ({
-//     type,
-//     payload
-//   });
-
-//   if (action.FIREBASE_CALL) {
-//     switch (action.type) {
-//       case "PASSWORD_RESET":
-//         store
-//           .getState()
-//           .firebase.auth.sendPasswordResetEmail(action.payload.email);
-//         break;
-//       case "PASSWORD_UPDATE":
-//         store
-//           .getState()
-//           .firebase.auth.currentUser.updatePassword(action.payload.password);
-//         break;
-
-//       default:
-//         break;
-//     }
-//     next(action);
-//   } else {
-//     return next(action);
-//   }
-// };
 
 export function firebaseInit() {
    return async (dispatch, getState) => {
@@ -55,17 +30,6 @@ export function firebaseInit() {
    };
 }
 
-// export function onAuthStateChanged() {
-//   return async (dispatch, getState) => {
-//     const { firebase } = getState();
-//     firebase.auth.onAuthStateChanged(authUser => {
-//       authUser
-//         ? dispatch({ type: "CHANGE_AUTH_USER", payload: { authUser } })
-//         : dispatch({ type: "CHANGE_AUTH_USER", payload: { authUser: null } });
-//     });
-//   };
-// }
-
 export async function user(uid) {
    return async (dispatch, getState) => {
       const { firebase } = getState();
@@ -80,6 +44,7 @@ export const doCreateUserWithEmailAndPassword = (login, name, surname, email, pa
    return async (dispatch, getState) => {
       const { firebase } = getState();
       try {
+         dispatch({ type: SIGNIN_LOADING_BEGIN });
          const authNew = firebase.auth;
          const newDb = firebase.db;
          var docRef = newDb.collection('users').doc(login);
@@ -87,11 +52,14 @@ export const doCreateUserWithEmailAndPassword = (login, name, surname, email, pa
             .get()
             .then(async function(doc) {
                if (doc.exists) {
+                  dispatch({ type: SIGNIN_LOADING_END });
+                  dispatch({
+                     type: SIGNIN_ERROR,
+                     payload: { text: 'Пользователь с таким логином уже существует' }
+                  });
                   console.log('Пользователь с таким логином уже существует');
                } else {
                   const authUser = await authNew.createUserWithEmailAndPassword(email, password);
-
-                  console.log(authUser);
                   dispatch({ type: 'CHANGE_AUTH', payload: { authNew } });
 
                   await newDb
@@ -107,19 +75,29 @@ export const doCreateUserWithEmailAndPassword = (login, name, surname, email, pa
                   dispatch({ type: 'CHANGE_DB', payload: { newDb } });
 
                   dispatch({ type: 'CHANGE_AUTH_USER', payload: { authUser } });
+
+                  dispatch({ type: SIGNIN_LOADING_END });
                }
             })
             .catch(function(error) {
-               console.log('Error getting document:', error);
+               dispatch({ type: SIGNIN_LOADING_END });
+               dispatch({
+                  type: SIGNIN_ERROR,
+                  payload: {
+                     text:
+                        error.code === 'auth/email-already-in-use'
+                           ? 'Эта почта уже используется другим аккаунтом'
+                           : 'Проверьте интернет-соединение'
+                  }
+               });
             });
-      } catch (e) {
-         throw new Error(e.message);
-      }
+      } catch (e) {}
    };
 };
 
 export function doSignInWithEmailAndPassword(email, password) {
    return async (dispatch, getState) => {
+      dispatch({ type: SIGNIN_LOADING_BEGIN });
       const { firebase } = getState();
       try {
          const authNew = firebase.auth;
@@ -128,8 +106,20 @@ export function doSignInWithEmailAndPassword(email, password) {
          await authNew.onAuthStateChanged((authUser) => {
             dispatch({ type: 'CHANGE_AUTH_USER', payload: { authUser } });
          });
-      } catch (e) {
-         throw new Error(e.message);
+         dispatch({ type: SIGNIN_LOADING_END });
+      } catch (error) {
+         dispatch({ type: SIGNIN_LOADING_END });
+         dispatch({
+            type: SIGNIN_ERROR,
+            payload: {
+               text:
+                  error.code === 'auth/user-not-found'
+                     ? 'Пользователь с этой почтой не найден'
+                     : error.code === 'auth/wrong-password'
+                     ? 'Введён не верный пароль'
+                     : 'Проверьте интернет-соединение'
+            }
+         });
       }
    };
 }
