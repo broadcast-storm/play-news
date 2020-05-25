@@ -21,21 +21,21 @@ import 'slick-carousel/slick/slick-theme.css';
 import styles from './style.module.scss';
 
 // @ts-ignore
-const App: React.FC = ({ location }) => {
+const App: React.FC = ({ location, firebaseInit }) => {
    useEffect(() => {
       firebaseInit();
+      // eslint-disable-next-line
    }, []);
 
    return (
       <div
          className={
-            location.pathname !== Routes.signupPage && location.pathname !== Routes.loginPage
+            !location.pathname.includes(Routes.loginPage)
                ? styles['background']
                : styles['dark-background']
          }>
          <Switch>
-            <Route exact path={Routes.loginPage} render={() => null} />
-            <Route exact path={Routes.signupPage} render={() => null} />
+            <Route path={Routes.loginPage} render={() => null} />
             <Route path={Routes.mainPage} component={Navbar} />
          </Switch>
 
@@ -48,8 +48,7 @@ const App: React.FC = ({ location }) => {
          </div>
 
          <Switch>
-            <Route exact path={Routes.loginPage} render={() => null} />
-            <Route exact path={Routes.signupPage} render={() => null} />
+            <Route path={Routes.loginPage} render={() => null} />
             <Route path={Routes.mainPage} component={Footer} />
          </Switch>
       </div>

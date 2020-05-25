@@ -9,7 +9,7 @@ type ProfileProps = {
 
 const Profile: React.FC<ProfileProps> = ({ imgUrl }) => {
    return (
-      <NavLink to={'/login'} className={styles['nav-bar__profile']}>
+      <NavLink to={'/auth'} className={styles['nav-bar__profile']}>
          <img src={imgUrl} alt="Profile img" className={styles['profile__img']} />
       </NavLink>
    );
