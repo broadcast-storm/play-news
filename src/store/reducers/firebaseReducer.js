@@ -1,9 +1,7 @@
 const initialState = {
-   remindList: [],
-   noteList: [],
-   isLoading: false,
-   initialize: true,
+   initialized: false,
    isLoadingSignIn: false,
+   donePasswordReset: false,
    errorSignIn: null,
    isLoadingSmall: false,
    error: null,
@@ -27,29 +25,20 @@ export const firebaseReducer = (state = initialState, action) => {
          return {
             ...state,
             auth: action.payload.auth,
-            db: action.payload.db
+            db: action.payload.db,
+            initialized: true
          };
       case 'CHANGE_AUTH_USER':
          return {
             ...state,
-            authUser: action.payload.authUser,
-            initialize: false
-         };
-      case 'CHANGE_AUTH':
-         return {
-            ...state,
-            auth: action.payload.authNew
-         };
-      case 'CHANGE_DB':
-         return {
-            ...state,
-            db: action.payload.newDb
+            authUser: action.payload.authUser
          };
       case 'SIGNIN_LOADING_BEGIN':
          return {
             ...state,
             isLoadingSignIn: true,
-            errorSignIn: null
+            errorSignIn: null,
+            donePasswordReset: false
          };
       case 'SIGNIN_LOADING_END':
          return {
@@ -62,26 +51,14 @@ export const firebaseReducer = (state = initialState, action) => {
             isLoadingSignIn: false,
             errorSignIn: action.payload.text
          };
-      case 'LOADING':
+      case 'DONE_PASSW_RESET':
          return {
             ...state,
-            isLoading: true
-         };
-      case 'STOP_INITIALIZE':
-         return {
-            ...state,
-            initialize: false
-         };
-      case 'LOADING_SMALL':
-         return {
-            ...state,
-            isLoadingSmall: true
+            donePasswordReset: true
          };
       case 'SIGN_OUT':
          return {
-            ...state,
-            remindList: [],
-            noteList: []
+            ...state
          };
       default:
          return state;

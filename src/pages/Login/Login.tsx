@@ -18,7 +18,8 @@ import { CircleSpinner } from 'react-spinners-kit';
 import {
    doSignInWithEmailAndPassword,
    doCreateUserWithEmailAndPassword,
-   doPasswordReset
+   doPasswordReset,
+   doSignInAdmin
 } from '@actions/firebase';
 import Vk from '@img/login/vk.png';
 import Facebook from '@img/login/facebook.png';
@@ -31,6 +32,8 @@ type LoginProps = {
    doPasswordReset: any;
    isLoadingSignIn: boolean;
    errorSignIn: any;
+   donePasswordReset: boolean;
+   doSignInAdmin: any;
    location: any;
 };
 
@@ -39,9 +42,17 @@ const Login: React.FC<LoginProps> = ({
    doCreateUserWithEmailAndPassword,
    doPasswordReset,
    errorSignIn,
+   donePasswordReset,
+   doSignInAdmin,
    isLoadingSignIn,
    location
 }) => {
+   useEffect(() => {
+      if (donePasswordReset !== false) {
+         setShowPasswAlert(true);
+      }
+   }, [donePasswordReset]);
+
    useEffect(() => {
       if (errorSignIn !== null) {
          setShow(true);
@@ -50,11 +61,13 @@ const Login: React.FC<LoginProps> = ({
 
    useEffect(() => {
       setShow(false);
+      setShowPasswAlert(false);
    }, [location.pathname]);
 
    const [passwordsCheckWrong, setPasswordsCheckWrong] = useState(false);
 
    const [show, setShow] = useState(false);
+   const [showPasswAlert, setShowPasswAlert] = useState(false);
    // FOR LOGIN
    const [email, setEmail] = useState<string>('');
    const [password, setPassword] = useState<string>('');
@@ -93,6 +106,7 @@ const Login: React.FC<LoginProps> = ({
 
    const adminFunc = (e: any) => {
       e.preventDefault();
+      doSignInAdmin(emailAdmin, passwordAdmin);
    };
 
    return (
@@ -107,6 +121,16 @@ const Login: React.FC<LoginProps> = ({
                }}
                dismissible>
                <p>{passwordsCheckWrong ? 'Не совпадают введёные пароли' : errorSignIn}</p>
+            </Alert>
+         ) : null}
+         {showPasswAlert ? (
+            <Alert
+               variant="success"
+               onClose={() => {
+                  setShowPasswAlert(false);
+               }}
+               dismissible>
+               <p>Проверьте свою почту. Вам отправлено письмо для смены пароля.</p>
             </Alert>
          ) : null}
          <Switch>
@@ -175,6 +199,11 @@ const Login: React.FC<LoginProps> = ({
                path={Routes.forgotPassword}
                render={() => (
                   <>
+                     <span className={styles['links__item']}>
+                        Введите почту, привязанную к вашему аккаунту
+                     </span>
+                     <br />
+                     <br />
                      <form className={styles['login-page__login-form']} onSubmit={forgotPasswFunc}>
                         <input
                            type="email"
@@ -215,6 +244,8 @@ const Login: React.FC<LoginProps> = ({
                            required
                            value={login}
                            onChange={(e) => setLogin(e.target.value)}
+                           pattern="[a-zA-Z0-9_-]{5,}"
+                           title="Логин не менее 5 символов. Можно использовать: a-z A-Z 0-9 _ -"
                         />
                         <input
                            type="text"
@@ -362,6 +393,7 @@ const mapDispatchToProps = (dispatch: any) => {
    return {
       doSignInWithEmailAndPassword: (email: string, password: string) =>
          dispatch(doSignInWithEmailAndPassword(email, password)),
+      doSignInAdmin: (email: string, password: string) => dispatch(doSignInAdmin(email, password)),
       doPasswordReset: (email: string) => dispatch(doPasswordReset(email)),
       doCreateUserWithEmailAndPassword: (
          login: string,

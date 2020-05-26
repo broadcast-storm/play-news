@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import 'firebase/auth';
 import 'firebase/database';
-import { firebaseInit } from '@actions/firebase';
+import { firebaseInit, startAuthStateChangeCheck } from '@actions/firebase';
 import { connect } from 'react-redux';
 
 import Navbar from '@components/Navbar';
@@ -21,11 +21,18 @@ import 'slick-carousel/slick/slick-theme.css';
 import styles from './style.module.scss';
 
 // @ts-ignore
-const App: React.FC = ({ location, firebaseInit }) => {
+const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, initialized }) => {
    useEffect(() => {
       firebaseInit();
       // eslint-disable-next-line
    }, []);
+
+   useEffect(() => {
+      if (initialized) {
+         startAuthStateChangeCheck();
+      }
+      // eslint-disable-next-line
+   }, [initialized]);
 
    return (
       <div
@@ -66,7 +73,8 @@ const mapDispatchToProps = (
    dispatch: (arg0: (dispatch: any, getState: any) => Promise<void>) => any
 ) => {
    return {
-      firebaseInit: () => dispatch(firebaseInit())
+      firebaseInit: () => dispatch(firebaseInit()),
+      startAuthStateChangeCheck: () => dispatch(startAuthStateChangeCheck())
    };
 };
 
