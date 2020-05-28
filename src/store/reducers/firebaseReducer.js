@@ -16,6 +16,7 @@ const initialState = {
    },
    auth: null,
    db: null,
+   functions: null,
    authUser: null
 };
 
@@ -26,6 +27,7 @@ export const firebaseReducer = (state = initialState, action) => {
             ...state,
             auth: action.payload.auth,
             db: action.payload.db,
+            functions: action.payload.functions,
             initialized: true
          };
       case 'CHANGE_AUTH_USER':
