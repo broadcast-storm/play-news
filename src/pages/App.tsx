@@ -9,9 +9,10 @@ import Navbar from '@components/Navbar';
 import Routes from '@config/routes';
 import { Route, Switch, withRouter } from 'react-router-dom';
 
-import Info from '@pages/Info';
-import News from '@pages/News';
+import UserPage from '@pages/UserPage';
+import AdminPage from '@pages/AdminPage';
 import Login from '@pages/Login';
+import News from '@pages/News';
 
 import Footer from '@components/Footer';
 
@@ -21,18 +22,18 @@ import 'slick-carousel/slick/slick-theme.css';
 import styles from './style.module.scss';
 
 // @ts-ignore
-const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, initialized }) => {
+const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, initDone }) => {
    useEffect(() => {
       firebaseInit();
       // eslint-disable-next-line
    }, []);
 
    useEffect(() => {
-      if (initialized) {
+      if (initDone) {
          startAuthStateChangeCheck();
       }
       // eslint-disable-next-line
-   }, [initialized]);
+   }, [initDone]);
 
    return (
       <div
@@ -48,9 +49,10 @@ const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, init
 
          <div className={styles['container']}>
             <Switch>
-               <Route exact path={Routes.mainPage} component={News} />
-               <Route path={Routes.infoPage} component={Info} />
+               <Route exact path={Routes.userPage} component={UserPage} />
+               <Route path={Routes.adminPage} component={AdminPage} />
                <Route path={Routes.loginPage} component={Login} />
+               <Route path={Routes.mainPage} component={News} />
             </Switch>
          </div>
 

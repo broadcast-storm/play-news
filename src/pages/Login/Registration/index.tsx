@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import React, { useState } from 'react';
 
 import Routes from '@config/routes';
 
@@ -7,41 +6,19 @@ import styles from '../style.module.scss';
 
 import { Link, NavLink } from 'react-router-dom';
 
-import { Alert } from 'react-bootstrap';
-
 import { CircleSpinner } from 'react-spinners-kit';
 
-import { doCreateUserWithEmailAndPassword } from '@actions/firebase';
 import Vk from '@img/login/vk.png';
 import Facebook from '@img/login/facebook.png';
 import Twitter from '@img/login/twitter.png';
 import Tel from '@img/login/telegram.png';
 
 type LoginProps = {
-   doCreateUserWithEmailAndPassword: any;
+   registrationFunc: any;
    isLoadingSignIn: boolean;
-   errorSignIn: any;
 };
 
-const Registration: React.FC<LoginProps> = ({
-   doCreateUserWithEmailAndPassword,
-   errorSignIn,
-   isLoadingSignIn
-}) => {
-   useEffect(() => {
-      if (errorSignIn !== null) {
-         setShow(true);
-      }
-   }, [errorSignIn]);
-
-   useEffect(() => {
-      setShow(false);
-      setShowPasswAlert(false);
-   }, []);
-
-   const [passwordsCheckWrong, setPasswordsCheckWrong] = useState(false);
-   const [show, setShow] = useState(false);
-   const [showPasswAlert, setShowPasswAlert] = useState(false);
+const Registration: React.FC<LoginProps> = ({ registrationFunc, isLoadingSignIn }) => {
    // FOR REGISTRATION
    const [login, setLogin] = useState<string>('');
    const [name, setName] = useState<string>('');
@@ -50,19 +27,14 @@ const Registration: React.FC<LoginProps> = ({
    const [passwordReg, setPasswordReg] = useState<string>('');
    const [passwordRegCheck, setPasswordRegCheck] = useState<string>('');
 
-   const registrationFunc = (e: any) => {
-      e.preventDefault();
-      if (passwordReg === passwordRegCheck) {
-         doCreateUserWithEmailAndPassword(login, name, surname, emailReg, passwordReg);
-      } else {
-         setPasswordsCheckWrong(true);
-         setShow(true);
-      }
-   };
-
    return (
       <>
-         <form className={styles['login-page__login-form']} onSubmit={registrationFunc}>
+         <form
+            className={styles['login-page__login-form']}
+            onSubmit={(e) => {
+               e.preventDefault();
+               registrationFunc(login, name, surname, emailReg, passwordReg, passwordRegCheck);
+            }}>
             <input
                type="text"
                className={styles['login-from__input']}
@@ -125,7 +97,7 @@ const Registration: React.FC<LoginProps> = ({
                {!isLoadingSignIn ? (
                   'Зарегистрироваться'
                ) : (
-                  <CircleSpinner size={30} color="#182126" />
+                  <CircleSpinner size={21} color="#182126" />
                )}
             </button>
          </form>
@@ -157,23 +129,4 @@ const Registration: React.FC<LoginProps> = ({
    );
 };
 
-// @ts-ignore
-const mapStateToProps = ({ firebase }) => {
-   return {
-      ...firebase
-   };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-   return {
-      doCreateUserWithEmailAndPassword: (
-         login: string,
-         name: string,
-         surname: string,
-         email: string,
-         password: string
-      ) => dispatch(doCreateUserWithEmailAndPassword(login, name, surname, email, password))
-   };
-};
-// @ts-ignore
-export default connect(mapStateToProps, mapDispatchToProps)(Registration);
+export default Registration;

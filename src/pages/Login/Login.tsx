@@ -4,16 +4,13 @@ import { connect } from 'react-redux';
 import Routes from '@config/routes';
 
 import { Route, Switch, withRouter } from 'react-router-dom';
+import { Redirect } from 'react-router';
 
 import Logo from '@components/Logo';
 
 import styles from './style.module.scss';
 
-import { Link, NavLink } from 'react-router-dom';
-
 import { Alert } from 'react-bootstrap';
-
-import { CircleSpinner } from 'react-spinners-kit';
 
 import {
    doSignInWithEmailAndPassword,
@@ -26,11 +23,7 @@ import SignIn from './SignIn';
 import SignInAdmin from './Admin';
 import ForgotPassword from './ForgotPassword';
 import Registration from './Registration';
-
-import Vk from '@img/login/vk.png';
-import Facebook from '@img/login/facebook.png';
-import Twitter from '@img/login/twitter.png';
-import Tel from '@img/login/telegram.png';
+import VerifyMail from './VerifyMail';
 
 type LoginProps = {
    doSignInWithEmailAndPassword: any;
@@ -41,6 +34,9 @@ type LoginProps = {
    donePasswordReset: boolean;
    doSignInAdmin: any;
    location: any;
+   auth: any;
+   authUser: any;
+   history: any;
 };
 
 const Login: React.FC<LoginProps> = ({
@@ -51,8 +47,35 @@ const Login: React.FC<LoginProps> = ({
    donePasswordReset,
    doSignInAdmin,
    isLoadingSignIn,
-   location
+   location,
+   auth,
+   authUser,
+   history
 }) => {
+   useEffect(() => {
+      if (authUser !== null) {
+         auth.currentUser.getIdTokenResult().then((idTokenResult: any) => {
+            console.log(idTokenResult);
+            if (idTokenResult.claims.login !== undefined) {
+               console.log('Уже вошел');
+               if (idTokenResult.claims.admin === true && location.pathname === Routes.admin) {
+                  console.log('Ты админ!');
+                  if (!auth.currentUser.emailVerified) history.push(Routes.verifyMail);
+                  else setRedirectPath('/admin/' + idTokenResult.claims.login);
+               } else {
+                  console.log('Ты юзер!');
+                  if (location.pathname === Routes.regist || !auth.currentUser.emailVerified)
+                     history.push(Routes.verifyMail);
+                  else setRedirectPath('/user/' + idTokenResult.claims.login);
+               }
+            }
+         });
+      } else {
+         console.log('Не вошел');
+      }
+      // eslint-disable-next-line
+   }, [authUser]);
+
    useEffect(() => {
       if (donePasswordReset !== false) {
          setShowPasswAlert(true);
@@ -70,38 +93,28 @@ const Login: React.FC<LoginProps> = ({
       setShowPasswAlert(false);
    }, [location.pathname]);
 
-   const [passwordsCheckWrong, setPasswordsCheckWrong] = useState(false);
+   const [redirectPath, setRedirectPath] = useState<string | null>(null);
 
    const [show, setShow] = useState(false);
    const [showPasswAlert, setShowPasswAlert] = useState(false);
-   // FOR LOGIN
-   const [email, setEmail] = useState<string>('');
-   const [password, setPassword] = useState<string>('');
-   // FOR FORGOT PASSWORD
-   const [emailForgotPassw, setEmailForgotPassw] = useState<string>('');
-   // FOR REGISTRATION
-   const [login, setLogin] = useState<string>('');
-   const [name, setName] = useState<string>('');
-   const [surname, setSurname] = useState<string>('');
-   const [emailReg, setEmailReg] = useState<string>('');
-   const [passwordReg, setPasswordReg] = useState<string>('');
-   const [passwordRegCheck, setPasswordRegCheck] = useState<string>('');
-   // FOR ADMIN
-   const [emailAdmin, setEmailAdmin] = useState<string>('');
-   const [passwordAdmin, setPasswordAdmin] = useState<string>('');
+   const [passwordsCheckWrong, setPasswordsCheckWrong] = useState(false);
 
-   const loginFunc = (e: any) => {
-      e.preventDefault();
+   const loginFunc = (email: string, password: string) => {
       doSignInWithEmailAndPassword(email, password);
    };
 
-   const forgotPasswFunc = (e: any) => {
-      e.preventDefault();
+   const forgotPasswFunc = (emailForgotPassw: string) => {
       doPasswordReset(emailForgotPassw);
    };
 
-   const registrationFunc = (e: any) => {
-      e.preventDefault();
+   const registrationFunc = (
+      login: string,
+      name: string,
+      surname: string,
+      emailReg: string,
+      passwordReg: string,
+      passwordRegCheck: string
+   ) => {
       if (passwordReg === passwordRegCheck) {
          doCreateUserWithEmailAndPassword(login, name, surname, emailReg, passwordReg);
       } else {
@@ -110,11 +123,11 @@ const Login: React.FC<LoginProps> = ({
       }
    };
 
-   const adminFunc = (e: any) => {
-      e.preventDefault();
+   const adminFunc = (emailAdmin: string, passwordAdmin: string) => {
       doSignInAdmin(emailAdmin, passwordAdmin);
    };
 
+   if (redirectPath !== null) return <Redirect to={redirectPath} />;
    return (
       <div className={styles['login-page']}>
          <Logo className={styles['login-page__big-logo']} />
@@ -145,9 +158,34 @@ const Login: React.FC<LoginProps> = ({
                path={Routes.loginPage}
                render={() => <SignIn isLoadingSignIn={isLoadingSignIn} loginFunc={loginFunc} />}
             />
-            <Route exact path={Routes.forgotPassword} render={() => <ForgotPassword />} />
-            <Route exact path={Routes.regist} render={() => <Registration />} />
-            <Route exact path={Routes.admin} render={() => <SignInAdmin />} />
+            <Route
+               exact
+               path={Routes.forgotPassword}
+               render={() => (
+                  <ForgotPassword
+                     forgotPasswFunc={forgotPasswFunc}
+                     isLoadingSignIn={isLoadingSignIn}
+                  />
+               )}
+            />
+            <Route
+               exact
+               path={Routes.regist}
+               render={() => (
+                  <Registration
+                     isLoadingSignIn={isLoadingSignIn}
+                     registrationFunc={registrationFunc}
+                  />
+               )}
+            />
+            <Route
+               exact
+               path={Routes.admin}
+               render={() => (
+                  <SignInAdmin adminFunc={adminFunc} isLoadingSignIn={isLoadingSignIn} />
+               )}
+            />
+            <Route exact path={Routes.verifyMail} render={() => <VerifyMail />} />
          </Switch>
       </div>
    );

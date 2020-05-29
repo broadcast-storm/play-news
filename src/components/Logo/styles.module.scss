@@ -1,13 +1,15 @@
-.logo{
-  display: flex;
-  justify-content: center;
-  vertical-align: center;
-  height: 40px;
-  .logo__img{
-    height: 100%;
-  }
+.logo {
+   display: flex;
+   justify-content: center;
+   vertical-align: center;
+   height: 40px;
+   .logo__img {
+      height: 100%;
+      max-width: 100%;
+   }
 }
 
-.logo:active, .logo:focus{
-  outline: none;
+.logo:active,
+.logo:focus {
+   outline: none;
 }

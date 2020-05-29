@@ -1,0 +1,27 @@
+.userContainer {
+   width: 100%;
+
+   min-height: 80vh;
+   background-color: #fff;
+   &__contentContainer {
+      width: 100%;
+      max-width: 945px;
+      margin: 0 auto;
+      padding-top: 40px;
+      .topInfo {
+         display: flex;
+         justify-content: start;
+         &__photo {
+            width: 128px;
+            margin-right: 20px;
+            .image {
+               width: 100%;
+            }
+         }
+
+         &__text {
+            width: 100%;
+         }
+      }
+   }
+}

@@ -1,70 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import React, { useState } from 'react';
 
 import Routes from '@config/routes';
 
 import styles from '../style.module.scss';
 
-import { Link, NavLink } from 'react-router-dom';
-
-import { Alert } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
 
 import { CircleSpinner } from 'react-spinners-kit';
 
-import { doPasswordReset } from '@actions/firebase';
-
 type LoginProps = {
-   doSignInWithEmailAndPassword: any;
-   doCreateUserWithEmailAndPassword: any;
-   doPasswordReset: any;
+   forgotPasswFunc: any;
    isLoadingSignIn: boolean;
-   errorSignIn: any;
-   donePasswordReset: boolean;
-   doSignInAdmin: any;
-   location: any;
 };
 
-const ForgotPassword: React.FC<LoginProps> = ({
-   doPasswordReset,
-   errorSignIn,
-   donePasswordReset
-}) => {
-   useEffect(() => {
-      if (donePasswordReset !== false) {
-         setShowPasswAlert(true);
-      }
-   }, [donePasswordReset]);
-
-   useEffect(() => {
-      if (errorSignIn !== null) {
-         setShow(true);
-      }
-   }, [errorSignIn]);
-
-   useEffect(() => {
-      setShow(false);
-      setShowPasswAlert(false);
-   }, []);
-
-   const [passwordsCheckWrong, setPasswordsCheckWrong] = useState(false);
-
-   const [show, setShow] = useState(false);
-   const [showPasswAlert, setShowPasswAlert] = useState(false);
-
+const ForgotPassword: React.FC<LoginProps> = ({ forgotPasswFunc, isLoadingSignIn }) => {
    // FOR FORGOT PASSWORD
    const [emailForgotPassw, setEmailForgotPassw] = useState<string>('');
-
-   const forgotPasswFunc = (e: any) => {
-      e.preventDefault();
-      doPasswordReset(emailForgotPassw);
-   };
 
    return (
       <>
          <span className={styles['links__item']}>Введите почту, привязанную к вашему аккаунту</span>
          <br />
          <br />
-         <form className={styles['login-page__login-form']} onSubmit={forgotPasswFunc}>
+         <form
+            className={styles['login-page__login-form']}
+            onSubmit={(e: any) => {
+               e.preventDefault();
+               forgotPasswFunc(emailForgotPassw);
+            }}>
             <input
                type="email"
                pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
@@ -76,7 +39,7 @@ const ForgotPassword: React.FC<LoginProps> = ({
                onChange={(e) => setEmailForgotPassw(e.target.value)}
             />
             <button type={'submit'} className={styles['login-form__btn']}>
-               Отправить запрос
+               {!isLoadingSignIn ? 'Отправить запрос' : <CircleSpinner size={21} color="#182126" />}
             </button>
          </form>
          <div className={styles['links']}>
@@ -92,16 +55,4 @@ const ForgotPassword: React.FC<LoginProps> = ({
 };
 
 // @ts-ignore
-const mapStateToProps = ({ firebase }) => {
-   return {
-      ...firebase
-   };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-   return {
-      doPasswordReset: (email: string) => dispatch(doPasswordReset(email))
-   };
-};
-// @ts-ignore
-export default connect(mapStateToProps, mapDispatchToProps)(ForgotPassword);
+export default ForgotPassword;

@@ -2,12 +2,13 @@ import app from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
+import 'firebase/storage';
 
 const SIGNIN_LOADING_BEGIN = 'SIGNIN_LOADING_BEGIN';
 const SIGNIN_LOADING_END = 'SIGNIN_LOADING_END';
-const ADMIN_LOGGED_IN = 'ADMIN_LOGGED_IN';
 const SIGNIN_ERROR = 'SIGNIN_ERROR';
 const DONE_PASSW_RESET = 'DONE_PASSW_RESET';
+const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 
 // ИНИЦИАЛИЗАЦИЯ FIREBASE
 export function firebaseInit() {
@@ -17,7 +18,15 @@ export function firebaseInit() {
       const auth = app.auth();
       const db = app.firestore();
       const functions = app.functions();
-      dispatch({ type: 'INIT', payload: { auth, db, functions } });
+      const storage = app.storage();
+      const storageRef = storage.ref();
+      const usersPhotoRef = storageRef.child('usersPhoto');
+      const defaultUserRef = usersPhotoRef.child('default');
+
+      dispatch({
+         type: 'INIT',
+         payload: { auth, db, functions, storage, storageRef, usersPhotoRef, defaultUserRef }
+      });
    };
 }
 
@@ -60,20 +69,34 @@ export const doCreateUserWithEmailAndPassword = (login, name, surname, email, pa
                   });
                } else {
                   await firebase.auth.createUserWithEmailAndPassword(email, password);
-                  const addNewLogin = firebase.functions.httpsCallable('addNewLogin');
-                  const result = await addNewLogin({ login });
-                  console.log(result);
+                  const saveNewLogin = firebase.functions.httpsCallable('saveLogin');
+                  const saveResult = await saveNewLogin({ email: email, login: login });
+                  dispatch(doSignOut());
+                  await firebase.auth.signInWithEmailAndPassword(email, password);
+                  console.log(saveResult);
+                  const setInitialValues = firebase.functions.httpsCallable('setInitialInfo');
+                  const initialResult = await setInitialValues({
+                     email,
+                     login,
+                     name,
+                     surname
+                  });
 
-                  await firebase.db
-                     .collection('users')
-                     .doc(login)
-                     .set({
-                        email,
-                        login,
-                        name,
-                        surname
-                     });
+                  console.log(initialResult);
+
                   dispatch({ type: SIGNIN_LOADING_END });
+                  dispatch({ type: LOGIN_SUCCESS });
+                  var user = firebase.auth.currentUser;
+
+                  user
+                     .sendEmailVerification()
+                     .then(function() {
+                        // Email sent.
+                     })
+                     .catch(function(error) {
+                        // An error happened.
+                        console.log(error);
+                     });
                }
             })
             .catch(function(error) {
@@ -100,6 +123,17 @@ export function doSignInWithEmailAndPassword(email, password) {
 
       try {
          await firebase.auth.signInWithEmailAndPassword(email, password);
+
+         firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
+            await firebase.db
+               .collection('usersOpen')
+               .doc(idTokenResult.claims.login)
+               .update({
+                  userType: 'user'
+               });
+         });
+
+         dispatch({ type: LOGIN_SUCCESS });
          dispatch({ type: SIGNIN_LOADING_END });
       } catch (error) {
          dispatch({ type: SIGNIN_LOADING_END });
@@ -127,7 +161,15 @@ export function doSignInAdmin(email, password) {
          await firebase.auth.signInWithEmailAndPassword(email, password);
          const idTokenResult = await firebase.auth.currentUser.getIdTokenResult();
          if (idTokenResult.claims.admin === true) {
-            dispatch({ type: ADMIN_LOGGED_IN });
+            firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
+               await firebase.db
+                  .collection('usersOpen')
+                  .doc(idTokenResult.claims.login)
+                  .update({
+                     userType: 'admin'
+                  });
+            });
+            dispatch({ type: LOGIN_SUCCESS });
          } else {
             dispatch(doSignOut());
             dispatch({
@@ -212,24 +254,21 @@ export function areYouAdmin() {
    };
 }
 
-export function reAuthenticate() {
+export function reAuthenticate(password) {
    return async (dispatch, getState) => {
       const { firebase } = getState();
       try {
          const user = firebase.auth.currentUser;
 
-         const credential = firebase.auth.EmailAuthProvider.credential(
-            user.email,
-            'userProvidedPassword'
-         );
+         const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
 
          user
             .reauthenticateWithCredential(credential)
             .then(function() {
-               // User re-authenticated.
+               console.log('User re-authenticated.');
             })
             .catch(function(error) {
-               // An error happened.
+               console.log(error);
             });
       } catch (e) {
          console.log(e);

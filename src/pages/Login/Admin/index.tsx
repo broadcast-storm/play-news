@@ -1,17 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import React, { useState } from 'react';
 
 import Routes from '@config/routes';
 
-import styles from './style.module.scss';
+import styles from '../style.module.scss';
 
-import { Link, NavLink } from 'react-router-dom';
-
-import { Alert } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
 
 import { CircleSpinner } from 'react-spinners-kit';
-
-import { doSignInAdmin } from '@actions/firebase';
 
 type LoginProps = {
    isLoadingSignIn: boolean;
@@ -25,7 +20,12 @@ const SignInAdmin: React.FC<LoginProps> = ({ isLoadingSignIn, adminFunc }) => {
 
    return (
       <>
-         <form className={styles['login-page__login-form']} onSubmit={adminFunc}>
+         <form
+            className={styles['login-page__login-form']}
+            onSubmit={(e) => {
+               e.preventDefault();
+               adminFunc(emailAdmin, passwordAdmin);
+            }}>
             <span className={styles['links__item']}>Для администратора</span>
             <br />
             <input
@@ -48,7 +48,7 @@ const SignInAdmin: React.FC<LoginProps> = ({ isLoadingSignIn, adminFunc }) => {
                minLength={8}
             />
             <button type={'submit'} className={styles['login-form__btn']}>
-               {!isLoadingSignIn ? 'Войти' : <CircleSpinner size={30} color="#182126" />}
+               {!isLoadingSignIn ? 'Войти' : <CircleSpinner size={21} color="#182126" />}
             </button>
          </form>
 
@@ -64,5 +64,4 @@ const SignInAdmin: React.FC<LoginProps> = ({ isLoadingSignIn, adminFunc }) => {
    );
 };
 
-// @ts-ignore
 export default SignInAdmin;

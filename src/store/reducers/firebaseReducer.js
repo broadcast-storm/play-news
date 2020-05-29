@@ -1,7 +1,9 @@
 const initialState = {
+   initDone: false,
    initialized: false,
    isLoadingSignIn: false,
    donePasswordReset: false,
+   loginSuccess: false,
    errorSignIn: null,
    isLoadingSmall: false,
    error: null,
@@ -17,6 +19,10 @@ const initialState = {
    auth: null,
    db: null,
    functions: null,
+   storage: null,
+   storageRef: null,
+   usersPhotoRef: null,
+   defaultUserRef: null,
    authUser: null
 };
 
@@ -28,13 +34,29 @@ export const firebaseReducer = (state = initialState, action) => {
             auth: action.payload.auth,
             db: action.payload.db,
             functions: action.payload.functions,
-            initialized: true
+            storage: action.payload.storage,
+            storageRef: action.payload.storageRef,
+            usersPhotoRef: action.payload.usersPhotoRef,
+            defaultUserRef: action.payload.defaultUserRef,
+            initDone: true
          };
-      case 'CHANGE_AUTH_USER':
+      case 'LOGIN_SUCCESS':
          return {
             ...state,
-            authUser: action.payload.authUser
+            loginSuccess: true
          };
+      case 'CHANGE_AUTH_USER':
+         if (state.initialized)
+            return {
+               ...state,
+               authUser: action.payload.authUser
+            };
+         else
+            return {
+               ...state,
+               authUser: action.payload.authUser,
+               initialized: true
+            };
       case 'SIGNIN_LOADING_BEGIN':
          return {
             ...state,
@@ -60,7 +82,8 @@ export const firebaseReducer = (state = initialState, action) => {
          };
       case 'SIGN_OUT':
          return {
-            ...state
+            ...state,
+            loginSuccess: false
          };
       default:
          return state;

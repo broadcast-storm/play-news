@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import Routes from '@config/routes';
 
@@ -25,7 +25,12 @@ const SignIn: React.FC<LoginProps> = ({ loginFunc, isLoadingSignIn }) => {
 
    return (
       <>
-         <form className={styles['login-page__login-form']} onSubmit={loginFunc}>
+         <form
+            className={styles['login-page__login-form']}
+            onSubmit={(e) => {
+               e.preventDefault();
+               loginFunc(email, password);
+            }}>
             <input
                type="email"
                pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
@@ -46,7 +51,7 @@ const SignIn: React.FC<LoginProps> = ({ loginFunc, isLoadingSignIn }) => {
                minLength={8}
             />
             <button type={'submit'} className={styles['login-form__btn']}>
-               {!isLoadingSignIn ? 'Войти' : <CircleSpinner size={30} color="#182126" />}
+               {!isLoadingSignIn ? 'Войти' : <CircleSpinner size={21} color="#182126" />}
             </button>
          </form>
          <span>Войти через социальные сети</span>
@@ -76,5 +81,4 @@ const SignIn: React.FC<LoginProps> = ({ loginFunc, isLoadingSignIn }) => {
    );
 };
 
-// @ts-ignore
 export default SignIn;
