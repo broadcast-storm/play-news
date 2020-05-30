@@ -1,0 +1,55 @@
+.aboutContainer {
+   margin-left: 5px;
+   .editor {
+      .buttons {
+         display: flex;
+         justify-content: flex-end;
+         align-items: center;
+         margin-top: 8px;
+
+         .symbols {
+            color: #909090;
+            font-size: 13px;
+            margin-right: 10px;
+         }
+
+         .btn {
+            border: none;
+            width: 100px;
+            padding: 5px 0 5px 0;
+            margin-left: 5px;
+         }
+         .close-btn {
+            color: white;
+            background-color: #909090;
+         }
+         .save-btn {
+            color: white;
+            background-color: #f2cb04;
+         }
+      }
+      .input {
+         width: 380px;
+         padding: 5px;
+         border-radius: 2px;
+         border-width: 1px;
+         border-color: #909090;
+         resize: none;
+      }
+   }
+
+   .text {
+      display: flex;
+      &__info {
+         width: 380px;
+         color: #909090;
+         font-weight: bold;
+      }
+
+      &__image {
+         width: 20px;
+         height: 20px;
+         cursor: pointer;
+      }
+   }
+}

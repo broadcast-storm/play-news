@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 
-// import Routes from '@config/routes';
-
 import styles from '../style.module.scss';
-
-// import { NavLink } from 'react-router-dom';
 
 import { CircleSpinner } from 'react-spinners-kit';
 

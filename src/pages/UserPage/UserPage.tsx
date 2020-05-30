@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { CircleSpinner } from 'react-spinners-kit';
+import LogOut from '@components/LogOut';
+import AboutYourSelf from '@components/AboutYourSelf';
 import Routes from '@config/routes';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { Redirect } from 'react-router';
@@ -58,10 +60,25 @@ const UserPage: React.FC<UserProps> = ({ match, auth, authUser, history, initial
 
                <div className={styles['topInfo__text']}>
                   <div className={styles['top']}>
-                     <h2 className={styles['name']}>Никита Поздняк</h2>
-                     <span>Выход</span>
+                     <span className={styles['name']}>Никита Поздняк</span>
+                     <LogOut />
                   </div>
-                  <h3 className={styles['role']}>читатель</h3>
+                  <span className={styles['role']}>читатель</span>
+                  <div className={styles['mail']}>
+                     <span className={styles['mark']}>Почта:</span>
+                     <a href="mailto:nikita220800@mail.ru" className={styles['mail-link']}>
+                        nikita220800@mail.ru
+                     </a>
+                  </div>
+                  <div className={styles['aboutYourSelf']}>
+                     <span className={styles['mark']}>О себе:</span>
+                     <AboutYourSelf
+                        isYourAccount={checkYourAccount}
+                        info={
+                           'Очень интересная информация, которой я хочу поделиться на этой странице'
+                        }
+                     />
+                  </div>
                </div>
             </div>
          </div>

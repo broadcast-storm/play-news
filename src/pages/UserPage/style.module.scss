@@ -10,7 +10,7 @@
       padding-top: 40px;
       .topInfo {
          display: flex;
-         justify-content: start;
+         justify-content: flex-start;
          &__photo {
             width: 128px;
             margin-right: 20px;
@@ -21,6 +21,41 @@
 
          &__text {
             width: 100%;
+
+            .top {
+               display: flex;
+               justify-content: space-between;
+
+               .name {
+                  font-size: 30px;
+                  font-weight: bold;
+                  color: black;
+                  margin: 0;
+                  padding: 0;
+                  margin-left: -2px;
+               }
+            }
+            .role {
+               color: #909090;
+               font-size: 16px;
+            }
+            .mail {
+               .mail-link {
+                  margin-left: 10px;
+                  color: #f2cb04;
+                  text-decoration: none;
+                  font-weight: bold;
+               }
+            }
+            .aboutYourSelf {
+               display: flex;
+               justify-content: flex-start;
+               align-items: flex-start;
+            }
+            .mark {
+               color: black;
+               font-weight: bold;
+            }
          }
       }
    }

@@ -1,0 +1,19 @@
+.logout {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   width: 80px;
+   cursor: pointer;
+   &__text {
+      color: #909090;
+      font-size: 14px;
+      font-weight: bold;
+      margin-right: 10px;
+   }
+   &__text_hover {
+      color: #f2cb04;
+   }
+   &__image {
+      width: 26px;
+   }
+}
