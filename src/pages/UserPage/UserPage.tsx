@@ -86,13 +86,19 @@ const UserPage: React.FC<UserProps> = ({ match, auth, authUser, history, initial
                               id="newPhoto"
                               type="file"
                               className={styles['input']}
+                              accept="image/jpeg,image/png"
                               // @ts-ignore
                               onChange={getPhotoFromInput}
                               ref={photoInput}
                            />
                            <img src={UploadPhotoImg} alt="" className={styles['icon']} />
                         </label>
-                        <NewPhotoPopup photoFile={photoFile} isShow={showPhotoPopup} />
+                        <NewPhotoPopup
+                           photoFile={photoFile}
+                           isShow={showPhotoPopup}
+                           setPhotoFile={setPhotoFile}
+                           setShowPhotoPopup={setShowPhotoPopup}
+                        />
                      </>
                   ) : null}
                </div>
