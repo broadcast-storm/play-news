@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import { CircleSpinner } from 'react-spinners-kit';
 import LogOut from '@components/LogOut';
 import AboutYourSelf from '@components/AboutYourSelf';
 import Routes from '@config/routes';
+import NewPhotoPopup from '@components/NewPhotoPopup';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { Redirect } from 'react-router';
 
 import styles from './style.module.scss';
 
 import DefaultUserImg from '@img/user/defaultPhoto.png';
+import UploadPhotoImg from '@img/user/uploadPhoto.png';
 
 type UserProps = {
    match: any;
@@ -20,9 +22,15 @@ type UserProps = {
 };
 
 const UserPage: React.FC<UserProps> = ({ match, auth, authUser, history, initialized }) => {
+   const photoInput = useRef(null);
+
    const [checkYourAccount, setCheckYourAccount] = useState(false);
 
    const [loadingUserInfo, setLoadingUserInfo] = useState(true);
+
+   const [showPhotoPopup, setShowPhotoPopup] = useState(false);
+
+   const [photoFile, setPhotoFile] = useState<any>('');
 
    const isYourAccount = () => {
       if (auth.currentUser === null) return false;
@@ -35,6 +43,18 @@ const UserPage: React.FC<UserProps> = ({ match, auth, authUser, history, initial
             return false;
          }
       });
+   };
+
+   const getPhotoFromInput = (evt: any) => {
+      var tgt = evt.target || window.event!.srcElement,
+         files = tgt.files;
+      if (FileReader && files && files.length) {
+         var fr = new FileReader();
+         fr.onload = function() {
+            setPhotoFile(fr.result);
+         };
+         fr.readAsDataURL(files[0]);
+      }
    };
 
    useEffect(() => {
@@ -56,6 +76,25 @@ const UserPage: React.FC<UserProps> = ({ match, auth, authUser, history, initial
             <div className={styles['topInfo']}>
                <div className={styles['topInfo__photo']}>
                   <img src={DefaultUserImg} className={styles['image']} alt="" />
+                  {isYourAccount ? (
+                     <>
+                        <label
+                           className={styles['uploadPhotoBtn']}
+                           htmlFor="newPhoto"
+                           onClick={() => setShowPhotoPopup(true)}>
+                           <input
+                              id="newPhoto"
+                              type="file"
+                              className={styles['input']}
+                              // @ts-ignore
+                              onChange={getPhotoFromInput}
+                              ref={photoInput}
+                           />
+                           <img src={UploadPhotoImg} alt="" className={styles['icon']} />
+                        </label>
+                        <NewPhotoPopup photoFile={photoFile} isShow={showPhotoPopup} />
+                     </>
+                  ) : null}
                </div>
 
                <div className={styles['topInfo__text']}>

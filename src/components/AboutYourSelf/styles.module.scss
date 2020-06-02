@@ -36,6 +36,10 @@
          border-color: #909090;
          resize: none;
       }
+      .input:active,
+      .input:hover {
+         outline: none;
+      }
    }
 
    .text {

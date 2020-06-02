@@ -12,10 +12,35 @@
          display: flex;
          justify-content: flex-start;
          &__photo {
+            position: relative;
             width: 128px;
             margin-right: 20px;
             .image {
                width: 100%;
+            }
+            .uploadPhotoBtn {
+               position: absolute;
+               bottom: 15px;
+               right: 2px;
+               display: block;
+               border: none;
+               background-color: rgba(255, 255, 255, 0);
+               border-radius: 5px;
+               padding: 3px;
+               cursor: pointer;
+               .input {
+                  display: none;
+               }
+               .icon {
+                  width: 20px;
+               }
+            }
+            .uploadPhotoBtn:active {
+               background-color: #f2cb04;
+            }
+            .uploadPhotoBtn:active,
+            .uploadPhotoBtn:focus {
+               outline: none;
             }
          }
 

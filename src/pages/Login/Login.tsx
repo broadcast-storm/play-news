@@ -89,6 +89,7 @@ const Login: React.FC<LoginProps> = ({
    }, [errorSignIn]);
 
    useEffect(() => {
+      window.scrollTo(0, 0);
       setShow(false);
       setShowPasswAlert(false);
    }, [location.pathname]);
