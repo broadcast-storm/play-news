@@ -9,6 +9,11 @@ const SIGNIN_LOADING_END = 'SIGNIN_LOADING_END';
 const SIGNIN_ERROR = 'SIGNIN_ERROR';
 const DONE_PASSW_RESET = 'DONE_PASSW_RESET';
 const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+const VIEWED_USER_INFO_LOADING = 'VIEWED_USER_INFO_LOADING';
+const VIEWED_USER_INFO_LOADED = 'VIEWED_USER_INFO_LOADED';
+const CLEAR_VIEWED_USER_INFO = 'CLEAR_VIEWED_USER_INFO';
+const UPDATE_USER_INFO_BEGIN = 'UPDATE_USER_INFO_BEGIN';
+const USER_INFO_UPDATED = 'USER_INFO_UPDATED';
 
 // ИНИЦИАЛИЗАЦИЯ FIREBASE
 export function firebaseInit() {
@@ -273,5 +278,75 @@ export function reAuthenticate(password) {
       } catch (e) {
          console.log(e);
       }
+   };
+}
+
+// ПОЛУЧИТЬ ДАННЫЕ ДЛЯ ПРОСМАТРИВАЕМОГО ЛИЧНОГО КАБИНЕТА
+export function getViewedUserInfo(login) {
+   return (dispatch, getState) => {
+      const { firebase } = getState();
+      dispatch({ type: VIEWED_USER_INFO_LOADING });
+
+      firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
+         if (idTokenResult.claims.login === login) {
+            const openInfo = await firebase.db
+               .collection('usersOpen')
+               .doc(login)
+               .get();
+            const secureInfo = await firebase.db
+               .collection('usersSecure')
+               .doc(login)
+               .get();
+            dispatch({
+               type: VIEWED_USER_INFO_LOADED,
+               payload: { openInfo: openInfo.data(), secureInfo: secureInfo.data() }
+            });
+         } else {
+            const openInfo = await firebase.db
+               .collection('usersOpen')
+               .doc(login)
+               .get();
+            dispatch({
+               type: VIEWED_USER_INFO_LOADED,
+               payload: { openInfo: openInfo.data(), secureInfo: null }
+            });
+         }
+      });
+   };
+}
+
+// ОЧИСТИТЬ ДАННЫЕ ПРОСМАТРИВАЕМОГО ЛИЧНОГО КАБИНЕТА
+export function clearViewedUserInfo() {
+   return (dispatch, getState) => {
+      dispatch({ type: CLEAR_VIEWED_USER_INFO });
+   };
+}
+
+// ИЗМЕНИТЬ ТЕКСТ О СЕБЕ
+export function changeAboutYourself(text) {
+   return (dispatch, getState) => {
+      const { firebase } = getState();
+      dispatch({ type: UPDATE_USER_INFO_BEGIN });
+
+      firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
+         await firebase.db
+            .collection('usersOpen')
+            .doc(idTokenResult.claims.login)
+            .update({
+               aboutYourself: text
+            });
+         const openInfo = await firebase.db
+            .collection('usersOpen')
+            .doc(idTokenResult.claims.login)
+            .get();
+         const secureInfo = await firebase.db
+            .collection('usersSecure')
+            .doc(idTokenResult.claims.login)
+            .get();
+         dispatch({
+            type: USER_INFO_UPDATED,
+            payload: { openInfo: openInfo.data(), secureInfo: secureInfo.data() }
+         });
+      });
    };
 }

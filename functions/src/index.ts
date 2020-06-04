@@ -1,8 +1,57 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
+import { tmpdir } from 'os';
+import { join, dirname } from 'path';
+
+import * as sharp from 'sharp';
+import * as fs from 'fs-extra';
+
 admin.initializeApp();
 
+const gcs = admin.storage();
+
+exports.generateThumbs = functions.storage.object().onFinalize(async (object, context) => {
+   const bucket = gcs.bucket(object.bucket);
+   const filePath = object.name;
+   const contentType = object.contentType;
+   const fileName = filePath!.split('/').pop();
+   const bucketDir = dirname(filePath!);
+   const workingDir = join(tmpdir(), 'thumbs');
+   const tmpFilePath = join(workingDir, context.eventId);
+   const metadata = {
+      contentType: contentType
+   };
+
+   if (fileName?.includes('thumb@') || !object.contentType?.includes('image')) {
+      console.log('resize func close');
+      return false;
+   }
+
+   await fs.ensureDir(workingDir);
+   await bucket.file(filePath!).download({
+      destination: tmpFilePath
+   });
+   const sizes = [64, 128, 200];
+
+   const uploadPromises = sizes.map(async (size) => {
+      const thumbName = `thumb@${size}_${fileName}`;
+      const thumbPath = join(workingDir, thumbName);
+
+      await sharp(tmpFilePath)
+         .resize(size, size)
+         .toFile(thumbPath);
+
+      return bucket.upload(thumbPath, {
+         destination: join(bucketDir, thumbName),
+         metadata: metadata
+      });
+   });
+
+   await Promise.all(uploadPromises);
+
+   return fs.remove(workingDir);
+});
 // НАЗНАЧЕНИЕ АДМИНИСТРАТОРА
 async function grantAdminRole(email: string): Promise<void> {
    const user = await admin.auth().getUserByEmail(email);
@@ -111,8 +160,9 @@ exports.setInitialInfo = functions.https.onCall((data, context) => {
                userType: 'user',
                photo: null,
                avatar: null,
-               aboutYourself: null,
-               otherInfo: {}
+               aboutYourself: '',
+               otherInfo: {},
+               email: null
             })
             .then(() => {
                return {

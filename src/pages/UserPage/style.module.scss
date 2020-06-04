@@ -14,13 +14,14 @@
          &__photo {
             position: relative;
             width: 128px;
+            height: 128px;
             margin-right: 20px;
             .image {
                width: 100%;
             }
             .uploadPhotoBtn {
                position: absolute;
-               bottom: 15px;
+               bottom: 5px;
                right: 2px;
                display: block;
                border: none;
@@ -33,6 +34,7 @@
                }
                .icon {
                   width: 20px;
+                  margin: 0;
                }
             }
             .uploadPhotoBtn:active {

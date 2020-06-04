@@ -5,8 +5,6 @@ import 'react-image-crop-component/style.css';
 import styles from './styles.module.scss';
 import classNames from 'classnames';
 
-import DefaultUserImg from '@img/user/defaultPhoto.png';
-
 type NewPhotoPopupProps = {
    className?: string | null;
    isShow: boolean;

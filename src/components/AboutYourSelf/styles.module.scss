@@ -19,6 +19,10 @@
             padding: 5px 0 5px 0;
             margin-left: 5px;
          }
+         .btn:active,
+         .btn:focus {
+            outline: none;
+         }
          .close-btn {
             color: white;
             background-color: #909090;
@@ -26,6 +30,8 @@
          .save-btn {
             color: white;
             background-color: #f2cb04;
+            display: flex;
+            justify-content: center;
          }
       }
       .input {
@@ -37,7 +43,7 @@
          resize: none;
       }
       .input:active,
-      .input:hover {
+      .input:focus {
          outline: none;
       }
    }
@@ -45,9 +51,10 @@
    .text {
       display: flex;
       &__info {
-         width: 380px;
+         max-width: 370px;
          color: #909090;
          font-weight: bold;
+         margin-right: 10px;
       }
 
       &__image {
