@@ -12,6 +12,7 @@ admin.initializeApp();
 const gcs = admin.storage();
 
 exports.generateThumbs = functions.storage.object().onFinalize(async (object, context) => {
+   console.log(context);
    const bucket = gcs.bucket(object.bucket);
    const filePath = object.name;
    const contentType = object.contentType;
@@ -52,6 +53,69 @@ exports.generateThumbs = functions.storage.object().onFinalize(async (object, co
 
    return fs.remove(workingDir);
 });
+
+// ЗАГРУЗКА И ОПТИМИЗАЦИЯ ФОТО ПРОФИЛЯ
+exports.uploadPhotoAndGenerateThumbs = functions.https.onCall((data, context) => {
+   if (context.auth?.token.login === undefined) {
+      return {
+         error: 'Login error!'
+      };
+   }
+
+   // var photoUserRef = firebase.storageRef.child(
+   //    `usersPhoto/${idTokenResult.claims.login}/photo.jpg`
+   // );
+
+   // admin.storage();
+   const usersSecureListRef = admin
+      .firestore()
+      .collection('usersSecure')
+      .doc(context.auth?.token.login);
+
+   return usersSecureListRef
+      .set({
+         email: data.email,
+         comments: [],
+         drafts: [],
+         otherInfo: {}
+      })
+      .then(() => {
+         const usersOpenListRef = admin
+            .firestore()
+            .collection('usersOpen')
+            .doc(context.auth?.token.login);
+
+         return usersOpenListRef
+            .set({
+               login: data.login,
+               name: data.name,
+               surname: data.surname,
+               level: 1,
+               points: 0,
+               currentLevelPoints: 0,
+               articles: [],
+               isOnline: true,
+               userType: 'user',
+               photo: null,
+               avatar: null,
+               aboutYourself: '',
+               otherInfo: {},
+               email: null
+            })
+            .then(() => {
+               return {
+                  result: `User start info created!`
+               };
+            })
+            .catch((error: any) => {
+               return error;
+            });
+      })
+      .catch((error: any) => {
+         return error;
+      });
+});
+
 // НАЗНАЧЕНИЕ АДМИНИСТРАТОРА
 async function grantAdminRole(email: string): Promise<void> {
    const user = await admin.auth().getUserByEmail(email);

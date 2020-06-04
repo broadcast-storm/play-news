@@ -18,6 +18,9 @@
             margin-right: 20px;
             .image {
                width: 100%;
+               border-radius: 50%;
+               background-color: gray;
+               overflow: hidden;
             }
             .uploadPhotoBtn {
                position: absolute;

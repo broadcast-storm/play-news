@@ -25,7 +25,9 @@ const initialState = {
    defaultUserRef: null,
    authUser: null,
    viewedUserLoading: true,
-   viewedUserInfo: null,
+   viewedUserOpenInfo: null,
+   viewedUserSecureInfo: null,
+   viewedUserPhoto: null,
    userInfoUpdating: false
 };
 
@@ -97,16 +99,17 @@ export const firebaseReducer = (state = initialState, action) => {
          return {
             ...state,
             viewedUserLoading: false,
-            viewedUserInfo: {
-               openInfo: action.payload.openInfo,
-               secureInfo: action.payload.secureInfo
-            }
+            viewedUserOpenInfo: action.payload.openInfo,
+            viewedUserSecureInfo: action.payload.secureInfo,
+            viewedUserPhoto: action.payload.userPhoto
          };
       case 'CLEAR_VIEWED_USER_INFO':
          return {
             ...state,
             viewedUserLoading: false,
-            viewedUserInfo: null
+            viewedUserOpenInfo: null,
+            viewedUserSecureInfo: null,
+            viewedUserPhoto: null
          };
 
       case 'UPDATE_USER_INFO_BEGIN':
@@ -119,10 +122,7 @@ export const firebaseReducer = (state = initialState, action) => {
          return {
             ...state,
             userInfoUpdating: false,
-            viewedUserInfo: {
-               openInfo: action.payload.openInfo,
-               secureInfo: action.payload.secureInfo
-            }
+            ...action.payload
          };
       default:
          return state;

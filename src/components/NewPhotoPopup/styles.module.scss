@@ -67,6 +67,11 @@
                   padding: 5px 0 5px 0;
                   margin-left: 5px;
                }
+
+               .btn:active,
+               .btn:focus {
+                  outline: none;
+               }
                .close-btn {
                   color: white;
                   background-color: #909090;
@@ -74,6 +79,8 @@
                .save-btn {
                   color: white;
                   background-color: #f2cb04;
+                  display: flex;
+                  justify-content: center;
                }
             }
          }

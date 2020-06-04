@@ -293,23 +293,63 @@ export function getViewedUserInfo(login) {
                .collection('usersOpen')
                .doc(login)
                .get();
+
             const secureInfo = await firebase.db
                .collection('usersSecure')
                .doc(login)
                .get();
-            dispatch({
-               type: VIEWED_USER_INFO_LOADED,
-               payload: { openInfo: openInfo.data(), secureInfo: secureInfo.data() }
-            });
+
+            if (openInfo.data().photo.length !== 0) {
+               firebase.storageRef
+                  .child(`usersPhoto/${login}/thumb@200_photo.jpg`)
+                  .getDownloadURL()
+                  .then(function(url) {
+                     dispatch({
+                        type: VIEWED_USER_INFO_LOADED,
+                        payload: {
+                           openInfo: openInfo.data(),
+                           secureInfo: secureInfo.data(),
+                           userPhoto: url
+                        }
+                     });
+                  })
+                  .catch(function(error) {
+                     // Handle any errors
+                  });
+            } else {
+               dispatch({
+                  type: VIEWED_USER_INFO_LOADED,
+                  payload: {
+                     openInfo: openInfo.data(),
+                     secureInfo: secureInfo.data(),
+                     userPhoto: null
+                  }
+               });
+            }
          } else {
             const openInfo = await firebase.db
                .collection('usersOpen')
                .doc(login)
                .get();
-            dispatch({
-               type: VIEWED_USER_INFO_LOADED,
-               payload: { openInfo: openInfo.data(), secureInfo: null }
-            });
+            if (openInfo.data().photo.length !== 0) {
+               firebase.storageRef
+                  .child(`usersPhoto/${login}/thumb@200_photo.jpg`)
+                  .getDownloadURL()
+                  .then(function(url) {
+                     dispatch({
+                        type: VIEWED_USER_INFO_LOADED,
+                        payload: { openInfo: openInfo.data(), secureInfo: null, userPhoto: url }
+                     });
+                  })
+                  .catch(function(error) {
+                     // Handle any errors
+                  });
+            } else {
+               dispatch({
+                  type: VIEWED_USER_INFO_LOADED,
+                  payload: { openInfo: openInfo.data(), secureInfo: null, userPhoto: null }
+               });
+            }
          }
       });
    };
@@ -339,13 +379,58 @@ export function changeAboutYourself(text) {
             .collection('usersOpen')
             .doc(idTokenResult.claims.login)
             .get();
-         const secureInfo = await firebase.db
-            .collection('usersSecure')
-            .doc(idTokenResult.claims.login)
-            .get();
+         // const secureInfo = await firebase.db
+         //    .collection('usersSecure')
+         //    .doc(idTokenResult.claims.login)
+         //    .get();
          dispatch({
             type: USER_INFO_UPDATED,
-            payload: { openInfo: openInfo.data(), secureInfo: secureInfo.data() }
+            payload: { viewedUserOpenInfo: openInfo.data() }
+         });
+      });
+   };
+}
+
+// ЗАГРУЗИТЬ НОВОЕ ФОТО
+export function uploadUserPhoto(imageBlob) {
+   return (dispatch, getState) => {
+      const { firebase } = getState();
+      dispatch({ type: UPDATE_USER_INFO_BEGIN });
+
+      firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
+         var photoUserRef = firebase.storageRef.child(
+            `usersPhoto/${idTokenResult.claims.login}/photo.jpg`
+         );
+         photoUserRef.put(imageBlob).then(async function(snapshot) {
+            setTimeout(async () => {
+               await firebase.db
+                  .collection('usersOpen')
+                  .doc(idTokenResult.claims.login)
+                  .update({
+                     photo: ['thumb@200_photo.jpg', 'thumb@128_photo.jpg', 'thumb@64_photo.jpg']
+                  });
+
+               console.log('Uploaded a blob or file!');
+
+               const openInfo = await firebase.db
+                  .collection('usersOpen')
+                  .doc(idTokenResult.claims.login)
+                  .get();
+
+               firebase.storageRef
+                  .child(`usersPhoto/${idTokenResult.claims.login}/thumb@200_photo.jpg`)
+                  .getDownloadURL()
+                  .then(function(url) {
+                     dispatch({
+                        type: USER_INFO_UPDATED,
+                        payload: { viewedUserOpenInfo: openInfo.data(), viewedUserPhoto: url }
+                     });
+                  })
+                  .catch(function(error) {
+                     // Handle any errors
+                     console.log(error);
+                  });
+            }, 1000);
          });
       });
    };

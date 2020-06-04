@@ -25,7 +25,9 @@ type UserProps = {
    clearViewedUserInfo: any;
    getViewedUserInfo: any;
    viewedUserLoading: boolean;
-   viewedUserInfo: any;
+   viewedUserOpenInfo: any;
+   viewedUserSecureInfo: any;
+   viewedUserPhoto: any;
 };
 
 const UserPage: React.FC<UserProps> = ({
@@ -36,8 +38,10 @@ const UserPage: React.FC<UserProps> = ({
    initialized,
    clearViewedUserInfo,
    getViewedUserInfo,
-   viewedUserInfo,
-   viewedUserLoading
+   viewedUserLoading,
+   viewedUserOpenInfo,
+   viewedUserSecureInfo,
+   viewedUserPhoto
 }) => {
    const photoInput = useRef(null);
 
@@ -64,15 +68,6 @@ const UserPage: React.FC<UserProps> = ({
             setCheckYourAccount(false);
          }
       })();
-      // return auth.currentUser.getIdTokenResult().then((idTokenResult: any) => {
-      //    if (idTokenResult.claims.login === match.params.login) {
-      //       if (!auth.currentUser.emailVerified) {
-      //          history.push(Routes.verifyMail);
-      //       } else return true;
-      //    } else {
-      //       return false;
-      //    }
-      // });
    };
 
    const getPhotoFromInput = (evt: any) => {
@@ -124,7 +119,11 @@ const UserPage: React.FC<UserProps> = ({
          <div className={styles['userContainer__contentContainer']}>
             <div className={styles['topInfo']}>
                <div className={styles['topInfo__photo']}>
-                  <img src={DefaultUserImg} className={styles['image']} alt="" />
+                  <img
+                     src={viewedUserPhoto !== null ? viewedUserPhoto : DefaultUserImg}
+                     className={styles['image']}
+                     alt=""
+                  />
                   {checkYourAccount ? (
                      <>
                         <label
@@ -165,34 +164,34 @@ const UserPage: React.FC<UserProps> = ({
                <div className={styles['topInfo__text']}>
                   <div className={styles['top']}>
                      <span className={styles['name']}>
-                        {viewedUserInfo.openInfo.name + ' ' + viewedUserInfo.openInfo.surname}
+                        {viewedUserOpenInfo.name + ' ' + viewedUserOpenInfo.surname}
                      </span>
                      {checkYourAccount ? <LogOut /> : null}
                   </div>
                   <span className={styles['role']}>читатель</span>
-                  {checkYourAccount || viewedUserInfo.openInfo.email !== null ? (
+                  {checkYourAccount || viewedUserOpenInfo.email !== null ? (
                      <div className={styles['mail']}>
                         <span className={styles['mark']}>Почта:</span>
                         <a
                            href={
                               'mailto:' + !checkYourAccount
-                                 ? viewedUserInfo.openInfo.email
-                                 : viewedUserInfo.secureInfo.email
+                                 ? viewedUserOpenInfo.email
+                                 : viewedUserSecureInfo.email
                            }
                            className={styles['mail-link']}>
                            {!checkYourAccount
-                              ? viewedUserInfo.openInfo.email
-                              : viewedUserInfo.secureInfo.email}
+                              ? viewedUserOpenInfo.email
+                              : viewedUserSecureInfo.email}
                         </a>
                      </div>
                   ) : null}
                   <div className={styles['aboutYourSelf']}>
-                     {!checkYourAccount && viewedUserInfo.openInfo.aboutYourself === '' ? null : (
+                     {!checkYourAccount && viewedUserOpenInfo.aboutYourself === '' ? null : (
                         <>
                            <span className={styles['mark']}>О себе:</span>
                            <AboutYourSelf
                               isYourAccount={checkYourAccount}
-                              info={viewedUserInfo.openInfo.aboutYourself}
+                              info={viewedUserOpenInfo.aboutYourself}
                            />
                         </>
                      )}
