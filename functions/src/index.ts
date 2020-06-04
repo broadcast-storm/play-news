@@ -7,7 +7,7 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 import * as fs from 'fs-extra';
 
-admin.initializeApp();
+const firebase = admin.initializeApp();
 
 const gcs = admin.storage();
 
@@ -61,12 +61,28 @@ exports.uploadPhotoAndGenerateThumbs = functions.https.onCall((data, context) =>
          error: 'Login error!'
       };
    }
-
    // var photoUserRef = firebase.storageRef.child(
    //    `usersPhoto/${idTokenResult.claims.login}/photo.jpg`
    // );
 
-   // admin.storage();
+   const bucket = gcs.bucket();
+
+   bucket
+      .upload('images/bar.png', {
+         destination: 'foo/sub/bar.png',
+
+         gzip: true,
+         metadata: {
+            cacheControl: 'public, max-age=31536000'
+         }
+      })
+      .then(() => {
+         console.log(`${filename} uploaded.`);
+      })
+      .catch((err) => {
+         console.error('ERROR:', err);
+      });
+
    const usersSecureListRef = admin
       .firestore()
       .collection('usersSecure')
