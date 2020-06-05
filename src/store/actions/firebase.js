@@ -1,4 +1,5 @@
 import app from 'firebase/app';
+import * as FIREBASE from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
@@ -129,15 +130,6 @@ export function doSignInWithEmailAndPassword(email, password) {
       try {
          await firebase.auth.signInWithEmailAndPassword(email, password);
 
-         firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
-            await firebase.db
-               .collection('usersOpen')
-               .doc(idTokenResult.claims.login)
-               .update({
-                  userType: 'user'
-               });
-         });
-
          dispatch({ type: LOGIN_SUCCESS });
          dispatch({ type: SIGNIN_LOADING_END });
       } catch (error) {
@@ -166,14 +158,13 @@ export function doSignInAdmin(email, password) {
          await firebase.auth.signInWithEmailAndPassword(email, password);
          const idTokenResult = await firebase.auth.currentUser.getIdTokenResult();
          if (idTokenResult.claims.admin === true) {
-            firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
-               await firebase.db
-                  .collection('usersOpen')
-                  .doc(idTokenResult.claims.login)
-                  .update({
-                     userType: 'admin'
-                  });
-            });
+            const getAdminStatus = firebase.functions.httpsCallable('getAdminStatus');
+            const getStatusResult = await getAdminStatus({ email });
+            console.log(getStatusResult);
+
+            const credential = FIREBASE.auth.EmailAuthProvider.credential(email, password);
+            await firebase.auth.currentUser.reauthenticateWithCredential(credential);
+
             dispatch({ type: LOGIN_SUCCESS });
          } else {
             dispatch(doSignOut());
@@ -186,6 +177,7 @@ export function doSignInAdmin(email, password) {
          }
          dispatch({ type: SIGNIN_LOADING_END });
       } catch (error) {
+         console.log(error);
          dispatch({ type: SIGNIN_LOADING_END });
          dispatch({
             type: SIGNIN_ERROR,
@@ -201,6 +193,14 @@ export function doSignInAdmin(email, password) {
 export const doSignOut = () => {
    return async (dispatch, getState) => {
       const { firebase } = getState();
+      const idTokenResult = await firebase.auth.currentUser.getIdTokenResult();
+      if (idTokenResult.claims.loggedAsAdmin === true) {
+         const clearAdminStatus = firebase.functions.httpsCallable('clearAdminStatus');
+         const clearAdminStatusResults = await clearAdminStatus({
+            email: firebase.auth.currentUser.email
+         });
+         console.log(clearAdminStatusResults);
+      }
       await firebase.auth.signOut();
 
       dispatch({ type: 'SIGN_OUT' });
@@ -267,7 +267,7 @@ export function reAuthenticate(password) {
 
          const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
 
-         user
+         await user
             .reauthenticateWithCredential(credential)
             .then(function() {
                console.log('User re-authenticated.');
@@ -410,8 +410,6 @@ export function uploadUserPhoto(imageBlob) {
                      photo: ['thumb@200_photo.jpg', 'thumb@128_photo.jpg', 'thumb@64_photo.jpg']
                   });
 
-               console.log('Uploaded a blob or file!');
-
                const openInfo = await firebase.db
                   .collection('usersOpen')
                   .doc(idTokenResult.claims.login)
@@ -430,7 +428,7 @@ export function uploadUserPhoto(imageBlob) {
                      // Handle any errors
                      console.log(error);
                   });
-            }, 1000);
+            }, 5000);
          });
       });
    };

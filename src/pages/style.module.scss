@@ -5,14 +5,27 @@
 }
 
 .background {
+   position: fixed;
+   top: 0;
+   left: 0;
+   z-index: 1;
    width: 100%;
-   min-height: 100vh;
+   height: 100vh;
    background-color: #d7d7d9;
 }
 
 .dark-background {
+   position: fixed;
+   top: 0;
+   left: 0;
+   z-index: 1;
    width: 100%;
-   min-height: 100vh;
+   height: 100vh;
    background-color: #182126;
    color: white;
+}
+
+.container {
+   position: relative;
+   z-index: 2;
 }

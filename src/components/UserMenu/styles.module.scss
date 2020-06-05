@@ -1,0 +1,40 @@
+.menu-container {
+   display: flex;
+   justify-content: space-between;
+   .links {
+      display: flex;
+      justify-content: flex-start;
+
+      .link-item {
+         text-decoration: none;
+         display: block;
+         padding: 16px 32px 12px 32px;
+         background-color: #182126;
+         color: white;
+      }
+
+      .link-active {
+         box-sizing: border-box;
+         -moz-box-sizing: border-box;
+         -webkit-box-sizing: border-box;
+         border-bottom: 4px solid #f2cb04;
+      }
+      .link-item:hover {
+         background-color: #f2cb04;
+      }
+   }
+
+   .link-editor {
+      text-decoration: none;
+      display: block;
+      padding: 16px 20px 12px 20px;
+      background-color: #f2cb04;
+      color: #182126;
+   }
+   .link-hide {
+      // visibility: hidden;
+      background-color: #182126;
+      color: white;
+      border-bottom: 4px solid #f2cb04;
+   }
+}

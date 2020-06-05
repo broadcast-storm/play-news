@@ -1,0 +1,17 @@
+.editor-container {
+   width: 100%;
+   .form {
+      .input {
+         width: 100%;
+         border: 1px solid gray;
+         border-radius: 3px;
+         padding: 8px 5px;
+         outline-color: #182126;
+      }
+      .editor {
+         border-radius: 3px;
+         margin: 20px 0;
+         border: 1px solid gray;
+      }
+   }
+}

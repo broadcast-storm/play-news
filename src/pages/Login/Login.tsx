@@ -33,6 +33,7 @@ type LoginProps = {
    errorSignIn: any;
    donePasswordReset: boolean;
    doSignInAdmin: any;
+   loginSuccess: boolean;
    location: any;
    auth: any;
    authUser: any;
@@ -46,6 +47,7 @@ const Login: React.FC<LoginProps> = ({
    errorSignIn,
    donePasswordReset,
    doSignInAdmin,
+   loginSuccess,
    isLoadingSignIn,
    location,
    auth,
@@ -55,26 +57,25 @@ const Login: React.FC<LoginProps> = ({
    useEffect(() => {
       if (authUser !== null) {
          auth.currentUser.getIdTokenResult().then((idTokenResult: any) => {
-            console.log(idTokenResult);
             if (idTokenResult.claims.login !== undefined) {
-               console.log('Уже вошел');
                if (idTokenResult.claims.admin === true && location.pathname === Routes.admin) {
-                  console.log('Ты админ!');
                   if (!auth.currentUser.emailVerified) history.push(Routes.verifyMail);
-                  else setRedirectPath('/admin/' + idTokenResult.claims.login);
+                  else {
+                     if (idTokenResult.claims.loggedAsAdmin && loginSuccess)
+                        setRedirectPath('/admin/' + idTokenResult.claims.login);
+                  }
                } else {
-                  console.log('Ты юзер!');
                   if (location.pathname === Routes.regist || !auth.currentUser.emailVerified)
                      history.push(Routes.verifyMail);
-                  else setRedirectPath('/user/' + idTokenResult.claims.login);
+                  else {
+                     if (loginSuccess) setRedirectPath('/user/' + idTokenResult.claims.login);
+                  }
                }
             }
          });
-      } else {
-         console.log('Не вошел');
       }
       // eslint-disable-next-line
-   }, [authUser]);
+   }, [authUser, loginSuccess]);
 
    useEffect(() => {
       if (donePasswordReset !== false) {

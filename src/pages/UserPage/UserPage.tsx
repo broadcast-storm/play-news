@@ -6,8 +6,11 @@ import AboutYourSelf from '@components/AboutYourSelf';
 import Routes from '@config/routes';
 import NewPhotoPopup from '@components/NewPhotoPopup';
 import AlertPopup from '@components/AlertPopup';
+import UserMenu from '@components/UserMenu';
+import Editor from '@components/Editor';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { Redirect } from 'react-router';
+import classNames from 'classnames';
 
 import { clearViewedUserInfo, getViewedUserInfo } from '@actions/firebase';
 
@@ -17,6 +20,7 @@ import DefaultUserImg from '@img/user/defaultPhoto.png';
 import UploadPhotoImg from '@img/user/uploadPhoto.png';
 
 type UserProps = {
+   location: any;
    match: any;
    auth: any;
    authUser: any;
@@ -31,6 +35,7 @@ type UserProps = {
 };
 
 const UserPage: React.FC<UserProps> = ({
+   location,
    match,
    auth,
    authUser,
@@ -45,9 +50,9 @@ const UserPage: React.FC<UserProps> = ({
 }) => {
    const photoInput = useRef(null);
 
-   const [checkYourAccount, setCheckYourAccount] = useState(false);
+   const [isRedactor, setIsRedactor] = useState(false);
 
-   const [loadingUserInfo, setLoadingUserInfo] = useState(true);
+   const [checkYourAccount, setCheckYourAccount] = useState(false);
 
    const [showPhotoPopup, setShowPhotoPopup] = useState(false);
 
@@ -56,18 +61,27 @@ const UserPage: React.FC<UserProps> = ({
    const [photoFile, setPhotoFile] = useState<any>('');
 
    const isYourAccount = () => {
-      if (auth.currentUser === null) setCheckYourAccount(false);
-      (async () => {
-         const idTokenResult = await auth.currentUser.getIdTokenResult();
-         if (idTokenResult.claims.login === match.params.login) {
-            if (!auth.currentUser.emailVerified) {
-               history.push(Routes.verifyMail);
+      if (auth.currentUser === null) {
+         history.push(Routes.loginPage);
+         setCheckYourAccount(false);
+      } else {
+         (async () => {
+            const idTokenResult = await auth.currentUser.getIdTokenResult();
+            if (idTokenResult.claims.login === match.params.login) {
+               if (!auth.currentUser.emailVerified) {
+                  history.push(Routes.verifyMail);
+                  setCheckYourAccount(false);
+               } else {
+                  setCheckYourAccount(true);
+                  if (idTokenResult.claims.redactor || idTokenResult.claims.admin)
+                     setIsRedactor(true);
+               }
+            } else {
                setCheckYourAccount(false);
-            } else setCheckYourAccount(true);
-         } else {
-            setCheckYourAccount(false);
-         }
-      })();
+            }
+            getViewedUserInfo(match.params.login);
+         })();
+      }
    };
 
    const getPhotoFromInput = (evt: any) => {
@@ -79,9 +93,6 @@ const UserPage: React.FC<UserProps> = ({
          const newimg = new Image();
          fr.onload = function() {
             newimg.onload = function() {
-               console.log(files[0].size);
-               console.log('width: ' + newimg.width);
-               console.log('height: ' + newimg.height);
                if (
                   files[0].size < 2500000 &&
                   newimg.width <= 1280 &&
@@ -101,18 +112,26 @@ const UserPage: React.FC<UserProps> = ({
          fr.readAsDataURL(files[0]);
       }
    };
+   console.log(location.pathname);
 
    useEffect(() => {
       if (initialized) {
          isYourAccount();
-         getViewedUserInfo(match.params.login);
       }
       // eslint-disable-next-line
    }, [initialized]);
 
    useEffect(() => {}, [checkYourAccount]);
 
-   if (viewedUserLoading) return <CircleSpinner size={21} color="#f2cb04" />;
+   if (viewedUserLoading)
+      return (
+         <div className={styles['userContainer']}>
+            <div
+               className={classNames(styles['userContainer__contentContainer'], styles['loader'])}>
+               <CircleSpinner size={40} color="#f2cb04" />{' '}
+            </div>
+         </div>
+      );
 
    return (
       <div className={styles['userContainer']}>
@@ -168,7 +187,15 @@ const UserPage: React.FC<UserProps> = ({
                      </span>
                      {checkYourAccount ? <LogOut /> : null}
                   </div>
-                  <span className={styles['role']}>читатель</span>
+                  <span className={styles['role']}>
+                     {viewedUserOpenInfo.userType === 'admin'
+                        ? 'Админ'
+                        : viewedUserOpenInfo.userType === 'redactor'
+                        ? 'Редактор'
+                        : viewedUserOpenInfo.userType === 'user'
+                        ? 'Читатель'
+                        : null}
+                  </span>
                   {checkYourAccount || viewedUserOpenInfo.email !== null ? (
                      <div className={styles['mail']}>
                         <span className={styles['mark']}>Почта:</span>
@@ -198,6 +225,19 @@ const UserPage: React.FC<UserProps> = ({
                   </div>
                </div>
             </div>
+            <UserMenu
+               isYourAccount={checkYourAccount}
+               isRedactor={isRedactor}
+               login={match.params.login}
+               className={styles['menu']}
+            />
+            <Switch>
+               <Route
+                  exact
+                  path={Routes.userPageScreens.editor.replace(':login', match.params.login)}
+                  render={() => <Editor className={styles['editor']} />}
+               />
+            </Switch>
          </div>
       </div>
    );

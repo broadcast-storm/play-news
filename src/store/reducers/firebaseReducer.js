@@ -56,12 +56,22 @@ export const firebaseReducer = (state = initialState, action) => {
                ...state,
                authUser: action.payload.authUser
             };
-         else
-            return {
-               ...state,
-               authUser: action.payload.authUser,
-               initialized: true
-            };
+         else {
+            if (action.payload.authUser !== null) {
+               return {
+                  ...state,
+                  authUser: action.payload.authUser,
+                  initialized: true,
+                  loginSuccess: true
+               };
+            } else {
+               return {
+                  ...state,
+                  authUser: action.payload.authUser,
+                  initialized: true
+               };
+            }
+         }
       case 'SIGNIN_LOADING_BEGIN':
          return {
             ...state,

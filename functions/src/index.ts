@@ -7,129 +7,55 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 import * as fs from 'fs-extra';
 
-const firebase = admin.initializeApp();
+admin.initializeApp();
 
 const gcs = admin.storage();
 
 exports.generateThumbs = functions.storage.object().onFinalize(async (object, context) => {
-   console.log(context);
    const bucket = gcs.bucket(object.bucket);
    const filePath = object.name;
-   const contentType = object.contentType;
-   const fileName = filePath!.split('/').pop();
-   const bucketDir = dirname(filePath!);
-   const workingDir = join(tmpdir(), 'thumbs');
-   const tmpFilePath = join(workingDir, context.eventId);
-   const metadata = {
-      contentType: contentType
-   };
-
-   if (fileName?.includes('thumb@') || !object.contentType?.includes('image')) {
-      console.log('resize func close');
-      return false;
-   }
-
-   await fs.ensureDir(workingDir);
-   await bucket.file(filePath!).download({
-      destination: tmpFilePath
-   });
-   const sizes = [64, 128, 200];
-
-   const uploadPromises = sizes.map(async (size) => {
-      const thumbName = `thumb@${size}_${fileName}`;
-      const thumbPath = join(workingDir, thumbName);
-
-      await sharp(tmpFilePath)
-         .resize(size, size)
-         .toFile(thumbPath);
-
-      return bucket.upload(thumbPath, {
-         destination: join(bucketDir, thumbName),
-         metadata: metadata
-      });
-   });
-
-   await Promise.all(uploadPromises);
-
-   return fs.remove(workingDir);
-});
-
-// ЗАГРУЗКА И ОПТИМИЗАЦИЯ ФОТО ПРОФИЛЯ
-exports.uploadPhotoAndGenerateThumbs = functions.https.onCall((data, context) => {
-   if (context.auth?.token.login === undefined) {
-      return {
-         error: 'Login error!'
+   if (filePath?.includes('usersPhoto')) {
+      const contentType = object.contentType;
+      const fileName = filePath.split('/').pop();
+      const bucketDir = dirname(filePath);
+      const workingDir = join(tmpdir(), 'thumbs');
+      const tmpFilePath = join(workingDir, context.eventId);
+      const metadata = {
+         contentType: contentType
       };
-   }
-   // var photoUserRef = firebase.storageRef.child(
-   //    `usersPhoto/${idTokenResult.claims.login}/photo.jpg`
-   // );
 
-   const bucket = gcs.bucket();
+      if (fileName?.includes('thumb@') || !object.contentType?.includes('image')) {
+         console.log('resize func close');
+         return false;
+      }
 
-   bucket
-      .upload('images/bar.png', {
-         destination: 'foo/sub/bar.png',
+      await fs.ensureDir(workingDir);
+      await bucket.file(filePath).download({
+         destination: tmpFilePath
+      });
+      const sizes = [64, 128, 200];
 
-         gzip: true,
-         metadata: {
-            cacheControl: 'public, max-age=31536000'
-         }
-      })
-      .then(() => {
-         console.log(`${filename} uploaded.`);
-      })
-      .catch((err) => {
-         console.error('ERROR:', err);
+      const uploadPromises = sizes.map(async (size) => {
+         const thumbName = `thumb@${size}_${fileName}`;
+         const thumbPath = join(workingDir, thumbName);
+
+         await sharp(tmpFilePath)
+            .resize(size, size)
+            .toFile(thumbPath);
+
+         return bucket.upload(thumbPath, {
+            destination: join(bucketDir, thumbName),
+            metadata: metadata
+         });
       });
 
-   const usersSecureListRef = admin
-      .firestore()
-      .collection('usersSecure')
-      .doc(context.auth?.token.login);
+      await Promise.all(uploadPromises);
 
-   return usersSecureListRef
-      .set({
-         email: data.email,
-         comments: [],
-         drafts: [],
-         otherInfo: {}
-      })
-      .then(() => {
-         const usersOpenListRef = admin
-            .firestore()
-            .collection('usersOpen')
-            .doc(context.auth?.token.login);
+      const file = bucket.file(filePath);
 
-         return usersOpenListRef
-            .set({
-               login: data.login,
-               name: data.name,
-               surname: data.surname,
-               level: 1,
-               points: 0,
-               currentLevelPoints: 0,
-               articles: [],
-               isOnline: true,
-               userType: 'user',
-               photo: null,
-               avatar: null,
-               aboutYourself: '',
-               otherInfo: {},
-               email: null
-            })
-            .then(() => {
-               return {
-                  result: `User start info created!`
-               };
-            })
-            .catch((error: any) => {
-               return error;
-            });
-      })
-      .catch((error: any) => {
-         return error;
-      });
+      await file.delete();
+      return fs.remove(workingDir);
+   } else return false;
 });
 
 // НАЗНАЧЕНИЕ АДМИНИСТРАТОРА
@@ -156,6 +82,63 @@ exports.addAdmin = functions.https.onCall((data, context) => {
    return grantAdminRole(email).then(() => {
       return {
          result: `${email} is now a new admin!`
+      };
+   });
+});
+
+// ПОЛУЧЕНИЕ АДМИН-СТАТУСА ПРИ ВХОДЕ
+async function getAdminStatusFunc(email: string): Promise<void> {
+   const user = await admin.auth().getUserByEmail(email);
+   if ((user.customClaims as any).admin !== true) {
+      return;
+   }
+   const login = (user.customClaims as any).login;
+   return admin.auth().setCustomUserClaims(user.uid, {
+      admin: true,
+      redactor: false,
+      login: login,
+      loggedAsAdmin: true
+   });
+}
+
+exports.getAdminStatus = functions.https.onCall((data, context) => {
+   if (context.auth?.token.admin !== true) {
+      return {
+         error: 'User must be admin to creat new admin!'
+      };
+   }
+   const email = data.email;
+   return getAdminStatusFunc(email).then(() => {
+      return {
+         result: `${email} logged as admin!`
+      };
+   });
+});
+
+// УДАЛЕНИЕ АДМИН-СТАТУСА ПРИ ВЫХОДЕ
+async function clearAdminStatusFunc(email: string): Promise<void> {
+   const user = await admin.auth().getUserByEmail(email);
+   if ((user.customClaims as any).admin !== true) {
+      return;
+   }
+   const login = (user.customClaims as any).login;
+   return admin.auth().setCustomUserClaims(user.uid, {
+      admin: true,
+      redactor: false,
+      login: login
+   });
+}
+
+exports.clearAdminStatus = functions.https.onCall((data, context) => {
+   if (context.auth?.token.admin !== true) {
+      return {
+         error: 'User must be admin to creat new admin!'
+      };
+   }
+   const email = data.email;
+   return clearAdminStatusFunc(email).then(() => {
+      return {
+         result: `${email} log out as admin!`
       };
    });
 });
@@ -238,7 +221,7 @@ exports.setInitialInfo = functions.https.onCall((data, context) => {
                articles: [],
                isOnline: true,
                userType: 'user',
-               photo: null,
+               photo: [],
                avatar: null,
                aboutYourself: '',
                otherInfo: {},

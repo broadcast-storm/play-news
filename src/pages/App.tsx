@@ -36,12 +36,14 @@ const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, init
    }, [initDone]);
 
    return (
-      <div
-         className={
-            !location.pathname.includes(Routes.loginPage)
-               ? styles['background']
-               : styles['dark-background']
-         }>
+      <>
+         <div
+            className={
+               !location.pathname.includes(Routes.loginPage)
+                  ? styles['background']
+                  : styles['dark-background']
+            }
+         />
          <Switch>
             <Route path={Routes.loginPage} render={() => null} />
             <Route path={Routes.mainPage} component={Navbar} />
@@ -49,7 +51,7 @@ const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, init
 
          <div className={styles['container']}>
             <Switch>
-               <Route exact path={Routes.userPage} component={UserPage} />
+               <Route path={Routes.userPage} component={UserPage} />
                <Route path={Routes.adminPage} component={AdminPage} />
                <Route path={Routes.loginPage} component={Login} />
                <Route path={Routes.mainPage} component={News} />
@@ -60,7 +62,7 @@ const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, init
             <Route path={Routes.loginPage} render={() => null} />
             <Route path={Routes.mainPage} component={Footer} />
          </Switch>
-      </div>
+      </>
    );
 };
 

@@ -1,8 +1,14 @@
 .userContainer {
    width: 100%;
-
+   height: auto;
    min-height: 80vh;
    background-color: #fff;
+   .loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+   }
    &__contentContainer {
       width: 100%;
       max-width: 945px;
@@ -87,6 +93,12 @@
                font-weight: bold;
             }
          }
+      }
+      .menu {
+         margin-top: 50px;
+      }
+      .editor {
+         padding: 20px 0;
       }
    }
 }
