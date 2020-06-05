@@ -1102,7 +1102,7 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.2", "@babel/runtime@^7.4.5", "@babel/runtime@^7.5.1", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.4", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.2", "@babel/runtime@^7.4.5", "@babel/runtime@^7.5.1", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.4", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
   version "7.10.2"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.10.2.tgz#d103f21f2602497d38348a32e008637d506db839"
   integrity sha512-6sF3uQw2ivImfVIl62RZ7MXhO2tap69WeWK57vAaimT6AZbE4FbqjdEJIN1UqoD6wI6B+1n9UiagafH1sxjOtg==
@@ -1167,6 +1167,18 @@
   dependencies:
     codex-notifier "^1.1.2"
     codex-tooltip "^1.0.1"
+
+"@editorjs/header@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@editorjs/header/-/header-2.4.1.tgz#253ea37d8b63f5ac7b1462da152d9d469addcb09"
+  integrity sha512-mHEr9M2xgbUHffXs9yvjoJXOTDFTJt9RhtxDrGdwENo7OO5KF5jLSMijodYsirtLs85kr3oCwVqiGz6tR2wCuA==
+
+"@editorjs/link@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@editorjs/link/-/link-2.2.0.tgz#e72a7a9e88a8ca366e4a8eb3662b53dd1526fbf7"
+  integrity sha512-GZeWyLpuBkNCGcpJRKQqVVxVpHKU4Dul0iiP2+SpD4JuJ03aM7UZOdj74mbkfbxE4vieF7WjsXBLWmlcbk60KA==
+  dependencies:
+    "@babel/runtime" "^7.10.2"
 
 "@editorjs/paragraph@^2.6.1":
   version "2.6.1"

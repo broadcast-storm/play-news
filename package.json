@@ -64,6 +64,8 @@
   },
   "devDependencies": {
     "@editorjs/editorjs": "^2.18.0",
+    "@editorjs/header": "^2.4.1",
+    "@editorjs/link": "^2.2.0",
     "@editorjs/paragraph": "^2.6.1",
     "customize-cra": "^0.9.1",
     "prettier": "^1.19.1",
