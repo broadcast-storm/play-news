@@ -1,3 +1,3 @@
-import Editor from './Editor';
+import EditorArticle from './Editor';
 
-export default Editor;
+export default EditorArticle;

@@ -7,11 +7,30 @@
          border-radius: 3px;
          padding: 8px 5px;
          outline-color: #182126;
+         margin: 10px 0;
       }
-      .editor {
+      .editor-toolbar {
+         background-color: rgb(224, 224, 224);
+         border: none;
+         padding: 10px;
+      }
+      .editor-input {
+         min-height: 300px;
+         padding: 10px;
+         width: 100%;
+      }
+      .editor-wrapper {
+         border: 1px solid gray;
          border-radius: 3px;
          margin: 20px 0;
-         border: 1px solid gray;
+         padding: 0;
+         position: relative;
+         z-index: 3;
       }
+   }
+
+   .Article {
+      width: 100%;
+      overflow: hidden;
    }
 }

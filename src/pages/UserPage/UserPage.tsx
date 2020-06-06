@@ -7,7 +7,7 @@ import Routes from '@config/routes';
 import NewPhotoPopup from '@components/NewPhotoPopup';
 import AlertPopup from '@components/AlertPopup';
 import UserMenu from '@components/UserMenu';
-import Editor from '@components/Editor';
+import EditorArticle from '@components/Editor';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import classNames from 'classnames';
@@ -112,7 +112,6 @@ const UserPage: React.FC<UserProps> = ({
          fr.readAsDataURL(files[0]);
       }
    };
-   console.log(location.pathname);
 
    useEffect(() => {
       if (initialized) {
@@ -235,7 +234,7 @@ const UserPage: React.FC<UserProps> = ({
                <Route
                   exact
                   path={Routes.userPageScreens.editor.replace(':login', match.params.login)}
-                  render={() => <Editor className={styles['editor']} />}
+                  render={() => <EditorArticle className={styles['editor']} />}
                />
             </Switch>
          </div>
