@@ -78,6 +78,7 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
             />
          </form>
          <h2>Результат</h2>
+         <br />
          <div id="articleResult" className={styles['Article']}></div>
       </div>
    );
