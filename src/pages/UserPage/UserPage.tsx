@@ -124,7 +124,7 @@ const UserPage: React.FC<UserProps> = ({
 
    if (viewedUserLoading)
       return (
-         <div className={styles['userContainer']}>
+         <div className={classNames(styles['userContainer'], styles['containerLoader'])}>
             <div
                className={classNames(styles['userContainer__contentContainer'], styles['loader'])}>
                <CircleSpinner size={40} color="#f2cb04" />{' '}
@@ -168,7 +168,7 @@ const UserPage: React.FC<UserProps> = ({
                         <AlertPopup
                            status="Alert"
                            isShow={showPhotoSizeError}
-                           messageText="Фото (jpg или png) не должно превышать размер в 2 Мб, а разрешение не менее 512x512 и не более 1280x1280"
+                           messageText="Фото (jpg или png) не должно превышать размер в 2 Мб, а разрешение не более 1280x1280"
                            setShowAlert={(close: boolean) => {
                               setShowPhotoPopup(false);
                               setPhotoFile('');

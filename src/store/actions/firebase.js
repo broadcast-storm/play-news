@@ -12,6 +12,8 @@ const DONE_PASSW_RESET = 'DONE_PASSW_RESET';
 const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 const VIEWED_USER_INFO_LOADING = 'VIEWED_USER_INFO_LOADING';
 const VIEWED_USER_INFO_LOADED = 'VIEWED_USER_INFO_LOADED';
+const NAVBAR_USER_INFO_LOADING = 'NAVBAR_USER_INFO_LOADING';
+const NAVBAR_USER_INFO_LOADED = 'NAVBAR_USER_INFO_LOADED';
 const CLEAR_VIEWED_USER_INFO = 'CLEAR_VIEWED_USER_INFO';
 const UPDATE_USER_INFO_BEGIN = 'UPDATE_USER_INFO_BEGIN';
 const USER_INFO_UPDATED = 'USER_INFO_UPDATED';
@@ -41,9 +43,10 @@ export function startAuthStateChangeCheck() {
    return async (dispatch, getState) => {
       const { firebase } = getState();
       firebase.auth.onAuthStateChanged((authUser) => {
-         authUser
-            ? dispatch({ type: 'CHANGE_AUTH_USER', payload: { authUser } })
-            : dispatch({ type: 'CHANGE_AUTH_USER', payload: { authUser: null } });
+         if (authUser !== null) {
+            dispatch({ type: 'CHANGE_AUTH_USER', payload: { authUser } });
+            dispatch(getNavbarInfo());
+         } else dispatch({ type: 'CHANGE_AUTH_USER', payload: { authUser: null } });
       });
    };
 }
@@ -278,6 +281,47 @@ export function reAuthenticate(password) {
       } catch (e) {
          console.log(e);
       }
+   };
+}
+
+// ЗАГРУЗКА ИНФЫ О ПОЛЬЗОВАТЕЛЕ В NAVBAR
+export function getNavbarInfo() {
+   return (dispatch, getState) => {
+      const { firebase } = getState();
+      dispatch({ type: NAVBAR_USER_INFO_LOADING });
+
+      firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
+         const openInfo = await firebase.db
+            .collection('usersOpen')
+            .doc(idTokenResult.claims.login)
+            .get();
+
+         if (openInfo.data().photo.length !== 0) {
+            firebase.storageRef
+               .child(`usersPhoto/${idTokenResult.claims.login}/thumb@64_photo.jpg`)
+               .getDownloadURL()
+               .then(function(url) {
+                  dispatch({
+                     type: NAVBAR_USER_INFO_LOADED,
+                     payload: {
+                        openInfo: openInfo.data(),
+                        userPhoto: url
+                     }
+                  });
+               })
+               .catch(function(error) {
+                  console.log(error);
+               });
+         } else {
+            dispatch({
+               type: NAVBAR_USER_INFO_LOADED,
+               payload: {
+                  openInfo: openInfo.data(),
+                  userPhoto: null
+               }
+            });
+         }
+      });
    };
 }
 
