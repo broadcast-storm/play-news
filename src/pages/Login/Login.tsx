@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 
 import Routes from '@config/routes';
 
+import { CircleSpinner } from 'react-spinners-kit';
+
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { Redirect } from 'react-router';
 
@@ -38,6 +40,7 @@ type LoginProps = {
    auth: any;
    authUser: any;
    history: any;
+   initialized: boolean;
 };
 
 const Login: React.FC<LoginProps> = ({
@@ -52,10 +55,11 @@ const Login: React.FC<LoginProps> = ({
    location,
    auth,
    authUser,
-   history
+   history,
+   initialized
 }) => {
    useEffect(() => {
-      if (authUser !== null) {
+      if (authUser !== null && initialized) {
          auth.currentUser.getIdTokenResult().then((idTokenResult: any) => {
             if (idTokenResult.claims.login !== undefined) {
                if (idTokenResult.claims.admin === true && location.pathname === Routes.admin) {
@@ -75,7 +79,7 @@ const Login: React.FC<LoginProps> = ({
          });
       }
       // eslint-disable-next-line
-   }, [authUser, loginSuccess]);
+   }, [authUser, loginSuccess, initialized]);
 
    useEffect(() => {
       if (donePasswordReset !== false) {
@@ -102,6 +106,7 @@ const Login: React.FC<LoginProps> = ({
    const [passwordsCheckWrong, setPasswordsCheckWrong] = useState(false);
 
    const loginFunc = (email: string, password: string) => {
+      setShow(false);
       doSignInWithEmailAndPassword(email, password);
    };
 
@@ -117,6 +122,7 @@ const Login: React.FC<LoginProps> = ({
       passwordReg: string,
       passwordRegCheck: string
    ) => {
+      setShow(false);
       if (passwordReg === passwordRegCheck) {
          doCreateUserWithEmailAndPassword(login, name, surname, emailReg, passwordReg);
       } else {
@@ -126,6 +132,7 @@ const Login: React.FC<LoginProps> = ({
    };
 
    const adminFunc = (emailAdmin: string, passwordAdmin: string) => {
+      setShow(false);
       doSignInAdmin(emailAdmin, passwordAdmin);
    };
 
@@ -133,62 +140,76 @@ const Login: React.FC<LoginProps> = ({
    return (
       <div className={styles['login-page']}>
          <Logo className={styles['login-page__big-logo']} />
-         {show ? (
-            <Alert
-               variant="danger"
-               onClose={() => {
-                  setShow(false);
-                  if (passwordsCheckWrong) setPasswordsCheckWrong(false);
-               }}
-               dismissible>
-               <p>{passwordsCheckWrong ? 'Не совпадают введёные пароли' : errorSignIn}</p>
-            </Alert>
-         ) : null}
-         {showPasswAlert ? (
-            <Alert
-               variant="success"
-               onClose={() => {
-                  setShowPasswAlert(false);
-               }}
-               dismissible>
-               <p>Проверьте свою почту. Вам отправлено письмо для смены пароля.</p>
-            </Alert>
-         ) : null}
-         <Switch>
-            <Route
-               exact
-               path={Routes.loginPage}
-               render={() => <SignIn isLoadingSignIn={isLoadingSignIn} loginFunc={loginFunc} />}
-            />
-            <Route
-               exact
-               path={Routes.forgotPassword}
-               render={() => (
-                  <ForgotPassword
-                     forgotPasswFunc={forgotPasswFunc}
-                     isLoadingSignIn={isLoadingSignIn}
+         {!initialized ? (
+            <div className={styles['loader']}>
+               <CircleSpinner size={40} color="#f2cb04" />
+            </div>
+         ) : (
+            <>
+               {show ? (
+                  <Alert
+                     variant="danger"
+                     onClose={() => {
+                        setShow(false);
+                        if (passwordsCheckWrong) setPasswordsCheckWrong(false);
+                     }}
+                     dismissible>
+                     <p>{passwordsCheckWrong ? 'Не совпадают введёные пароли' : errorSignIn}</p>
+                  </Alert>
+               ) : null}
+               {showPasswAlert ? (
+                  <Alert
+                     variant="success"
+                     onClose={() => {
+                        setShowPasswAlert(false);
+                     }}
+                     dismissible>
+                     <p>Проверьте свою почту. Вам отправлено письмо для смены пароля.</p>
+                  </Alert>
+               ) : null}
+               <Switch>
+                  <Route
+                     exact
+                     path={Routes.loginPage}
+                     render={() => (
+                        <SignIn isLoadingSignIn={isLoadingSignIn} loginFunc={loginFunc} />
+                     )}
                   />
-               )}
-            />
-            <Route
-               exact
-               path={Routes.regist}
-               render={() => (
-                  <Registration
-                     isLoadingSignIn={isLoadingSignIn}
-                     registrationFunc={registrationFunc}
+                  <Route
+                     exact
+                     path={Routes.forgotPassword}
+                     render={() => (
+                        <ForgotPassword
+                           forgotPasswFunc={forgotPasswFunc}
+                           isLoadingSignIn={isLoadingSignIn}
+                        />
+                     )}
                   />
-               )}
-            />
-            <Route
-               exact
-               path={Routes.admin}
-               render={() => (
-                  <SignInAdmin adminFunc={adminFunc} isLoadingSignIn={isLoadingSignIn} />
-               )}
-            />
-            <Route exact path={Routes.verifyMail} render={() => <VerifyMail />} />
-         </Switch>
+                  <Route
+                     exact
+                     path={Routes.regist}
+                     render={() => (
+                        <Registration
+                           isLoadingSignIn={isLoadingSignIn}
+                           registrationFunc={registrationFunc}
+                        />
+                     )}
+                  />
+                  <Route
+                     exact
+                     path={Routes.admin}
+                     render={() => (
+                        <SignInAdmin adminFunc={adminFunc} isLoadingSignIn={isLoadingSignIn} />
+                     )}
+                  />
+                  <Route
+                     exact
+                     path={Routes.verifyMail}
+                     render={() => <VerifyMail verified={auth.currentUser.emailVerified} />}
+                  />
+               </Switch>
+            </>
+         )}
       </div>
    );
 };

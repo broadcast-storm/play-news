@@ -29,7 +29,7 @@ const initialState = {
    viewedUserSecureInfo: null,
    viewedUserPhoto: null,
    userInfoUpdating: false,
-   navbarInfoLoading: true,
+   navbarInfoLoading: false,
    navbarInfo: null
 };
 
@@ -101,7 +101,15 @@ export const firebaseReducer = (state = initialState, action) => {
       case 'SIGN_OUT':
          return {
             ...state,
-            loginSuccess: false
+            loginSuccess: false,
+            authUser: null,
+            viewedUserLoading: true,
+            viewedUserOpenInfo: null,
+            viewedUserSecureInfo: null,
+            viewedUserPhoto: null,
+            userInfoUpdating: false,
+            navbarInfoLoading: false,
+            navbarInfo: null
          };
       case 'VIEWED_USER_INFO_LOADING':
          return {
@@ -122,14 +130,21 @@ export const firebaseReducer = (state = initialState, action) => {
             viewedUserPhoto: action.payload.userPhoto
          };
       case 'NAVBAR_USER_INFO_LOADED':
-         return {
-            ...state,
-            navbarInfoLoading: false,
-            navbarInfo: {
-               openInfo: action.payload.openInfo,
-               userPhoto: action.payload.userPhoto
-            }
-         };
+         if (action.payload === null)
+            return {
+               ...state,
+               navbarInfoLoading: false,
+               navbarInfo: null
+            };
+         else
+            return {
+               ...state,
+               navbarInfoLoading: false,
+               navbarInfo: {
+                  openInfo: action.payload.openInfo,
+                  userPhoto: action.payload.userPhoto
+               }
+            };
       case 'CLEAR_VIEWED_USER_INFO':
          return {
             ...state,

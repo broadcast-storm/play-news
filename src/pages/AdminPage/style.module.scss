@@ -1,0 +1,107 @@
+.userContainer {
+   width: 100%;
+   height: auto;
+   min-height: 80vh;
+   background-color: #fff;
+   .loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+   }
+   &__contentContainer {
+      width: 100%;
+      max-width: 945px;
+      margin: 0 auto;
+      padding-top: 40px;
+      .topInfo {
+         display: flex;
+         justify-content: flex-start;
+         &__photo {
+            position: relative;
+            width: 128px;
+            height: 128px;
+            margin-right: 20px;
+            .image {
+               width: 100%;
+               border-radius: 50%;
+               background-color: gray;
+               overflow: hidden;
+            }
+            .uploadPhotoBtn {
+               position: absolute;
+               bottom: 5px;
+               right: 2px;
+               display: block;
+               border: none;
+               background-color: rgba(255, 255, 255, 0);
+               border-radius: 5px;
+               padding: 3px;
+               cursor: pointer;
+               .input {
+                  display: none;
+               }
+               .icon {
+                  width: 20px;
+                  margin: 0;
+               }
+            }
+            .uploadPhotoBtn:active {
+               background-color: #f2cb04;
+            }
+            .uploadPhotoBtn:active,
+            .uploadPhotoBtn:focus {
+               outline: none;
+            }
+         }
+
+         &__text {
+            width: 100%;
+
+            .top {
+               display: flex;
+               justify-content: space-between;
+
+               .name {
+                  font-size: 30px;
+                  font-weight: bold;
+                  color: black;
+                  margin: 0;
+                  padding: 0;
+                  margin-left: -2px;
+               }
+            }
+            .role {
+               color: #909090;
+               font-size: 16px;
+            }
+            .mail {
+               .mail-link {
+                  margin-left: 10px;
+                  color: #f2cb04;
+                  text-decoration: none;
+                  font-weight: bold;
+               }
+            }
+            .aboutYourSelf {
+               display: flex;
+               justify-content: flex-start;
+               align-items: flex-start;
+            }
+            .mark {
+               color: black;
+               font-weight: bold;
+            }
+         }
+      }
+      .menu {
+         margin-top: 50px;
+      }
+      .editor {
+         padding: 20px 0;
+      }
+   }
+}
+.containerLoader {
+   height: 80vh;
+}

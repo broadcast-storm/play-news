@@ -54,7 +54,14 @@ const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, init
                <Route path={Routes.userPage} component={UserPage} />
                <Route path={Routes.adminPage} component={AdminPage} />
                <Route path={Routes.loginPage} component={Login} />
-               <Route path={Routes.mainPage} component={News} />
+               <Route
+                  path={[
+                     Routes.mainPage,
+                     Routes.mainCategories.articles,
+                     Routes.mainCategories.reviews
+                  ]}
+                  component={News}
+               />
             </Switch>
          </div>
 

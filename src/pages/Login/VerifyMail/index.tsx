@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import { connect } from 'react-redux';
+
+import { doSignOut } from '@actions/firebase';
 
 import styles from '../style.module.scss';
 
 import { CircleSpinner } from 'react-spinners-kit';
 
-const VerifyMail: React.FC = () => {
+const VerifyMail: React.FC<{ doSignOut: any; verified: boolean }> = ({ doSignOut, verified }) => {
    const [clicked, setClicked] = useState(false);
+
+   useEffect(() => {
+      return () => {
+         if (!clicked && !verified) {
+            doSignOut();
+         }
+      };
+   }, []);
+
    return (
       <>
-         <span>
+         <span className={styles['verifyMail-text']}>
             На вашу почту отправлено письмо для подтверждения регистрации. Пожалуйста, перед
             переходом в свой профиль подтвердите свою почту
          </span>
@@ -28,4 +41,10 @@ const VerifyMail: React.FC = () => {
    );
 };
 
-export default VerifyMail;
+const mapDispatchToProps = (dispatch: any) => {
+   return {
+      doSignOut: () => dispatch(doSignOut())
+   };
+};
+
+export default connect(null, mapDispatchToProps)(VerifyMail);

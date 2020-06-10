@@ -56,6 +56,8 @@ const UserPage: React.FC<UserProps> = ({
 
    const [showPhotoPopup, setShowPhotoPopup] = useState(false);
 
+   const [urlChanged, setUrlChanged] = useState(true);
+
    const [showPhotoSizeError, setShowPhotoSizeError] = useState(false);
 
    const [photoFile, setPhotoFile] = useState<any>('');
@@ -80,6 +82,7 @@ const UserPage: React.FC<UserProps> = ({
                setCheckYourAccount(false);
             }
             getViewedUserInfo(match.params.login);
+            setUrlChanged(false);
          })();
       }
    };
@@ -114,15 +117,20 @@ const UserPage: React.FC<UserProps> = ({
    };
 
    useEffect(() => {
+      return () => {
+         setUrlChanged(true);
+         clearViewedUserInfo();
+      };
+   }, []);
+
+   useEffect(() => {
+      setUrlChanged(true);
       if (initialized) {
          isYourAccount();
       }
-      // eslint-disable-next-line
-   }, [initialized]);
+   }, [match.params.login, initialized]);
 
-   useEffect(() => {}, [checkYourAccount]);
-
-   if (viewedUserLoading)
+   if (viewedUserLoading || urlChanged)
       return (
          <div className={classNames(styles['userContainer'], styles['containerLoader'])}>
             <div

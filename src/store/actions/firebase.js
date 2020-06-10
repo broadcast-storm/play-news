@@ -45,7 +45,6 @@ export function startAuthStateChangeCheck() {
       firebase.auth.onAuthStateChanged((authUser) => {
          if (authUser !== null) {
             dispatch({ type: 'CHANGE_AUTH_USER', payload: { authUser } });
-            dispatch(getNavbarInfo());
          } else dispatch({ type: 'CHANGE_AUTH_USER', payload: { authUser: null } });
       });
    };
@@ -291,34 +290,41 @@ export function getNavbarInfo() {
       dispatch({ type: NAVBAR_USER_INFO_LOADING });
 
       firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
-         const openInfo = await firebase.db
-            .collection('usersOpen')
-            .doc(idTokenResult.claims.login)
-            .get();
+         if (firebase.authUser.emailVerified) {
+            const openInfo = await firebase.db
+               .collection('usersOpen')
+               .doc(idTokenResult.claims.login)
+               .get();
 
-         if (openInfo.data().photo.length !== 0) {
-            firebase.storageRef
-               .child(`usersPhoto/${idTokenResult.claims.login}/thumb@64_photo.jpg`)
-               .getDownloadURL()
-               .then(function(url) {
-                  dispatch({
-                     type: NAVBAR_USER_INFO_LOADED,
-                     payload: {
-                        openInfo: openInfo.data(),
-                        userPhoto: url
-                     }
+            if (openInfo.data().photo.length !== 0) {
+               firebase.storageRef
+                  .child(`usersPhoto/${idTokenResult.claims.login}/thumb@64_photo.jpg`)
+                  .getDownloadURL()
+                  .then(function(url) {
+                     dispatch({
+                        type: NAVBAR_USER_INFO_LOADED,
+                        payload: {
+                           openInfo: openInfo.data(),
+                           userPhoto: url
+                        }
+                     });
+                  })
+                  .catch(function(error) {
+                     console.log(error);
                   });
-               })
-               .catch(function(error) {
-                  console.log(error);
+            } else {
+               dispatch({
+                  type: NAVBAR_USER_INFO_LOADED,
+                  payload: {
+                     openInfo: openInfo.data(),
+                     userPhoto: null
+                  }
                });
+            }
          } else {
             dispatch({
                type: NAVBAR_USER_INFO_LOADED,
-               payload: {
-                  openInfo: openInfo.data(),
-                  userPhoto: null
-               }
+               payload: null
             });
          }
       });
@@ -344,22 +350,18 @@ export function getViewedUserInfo(login) {
                .get();
 
             if (openInfo.data().photo.length !== 0) {
-               firebase.storageRef
+               const url = await firebase.storageRef
                   .child(`usersPhoto/${login}/thumb@200_photo.jpg`)
-                  .getDownloadURL()
-                  .then(function(url) {
-                     dispatch({
-                        type: VIEWED_USER_INFO_LOADED,
-                        payload: {
-                           openInfo: openInfo.data(),
-                           secureInfo: secureInfo.data(),
-                           userPhoto: url
-                        }
-                     });
-                  })
-                  .catch(function(error) {
-                     // Handle any errors
-                  });
+                  .getDownloadURL();
+
+               dispatch({
+                  type: VIEWED_USER_INFO_LOADED,
+                  payload: {
+                     openInfo: openInfo.data(),
+                     secureInfo: secureInfo.data(),
+                     userPhoto: url
+                  }
+               });
             } else {
                dispatch({
                   type: VIEWED_USER_INFO_LOADED,
@@ -459,19 +461,25 @@ export function uploadUserPhoto(imageBlob) {
                   .doc(idTokenResult.claims.login)
                   .get();
 
-               firebase.storageRef
+               const photo200Url = await firebase.storageRef
                   .child(`usersPhoto/${idTokenResult.claims.login}/thumb@200_photo.jpg`)
-                  .getDownloadURL()
-                  .then(function(url) {
-                     dispatch({
-                        type: USER_INFO_UPDATED,
-                        payload: { viewedUserOpenInfo: openInfo.data(), viewedUserPhoto: url }
-                     });
-                  })
-                  .catch(function(error) {
-                     // Handle any errors
-                     console.log(error);
-                  });
+                  .getDownloadURL();
+
+               const photo64Url = await firebase.storageRef
+                  .child(`usersPhoto/${idTokenResult.claims.login}/thumb@64_photo.jpg`)
+                  .getDownloadURL();
+
+               dispatch({
+                  type: USER_INFO_UPDATED,
+                  payload: {
+                     viewedUserOpenInfo: openInfo.data(),
+                     viewedUserPhoto: photo200Url,
+                     navbarInfo: {
+                        openInfo: openInfo.data(),
+                        userPhoto: photo64Url
+                     }
+                  }
+               });
             }, 5000);
          });
       });

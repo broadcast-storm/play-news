@@ -1,5 +1,14 @@
 export default {
    mainPage: '/',
+   mainCategories: {
+      articles: '/articles',
+      reviews: '/reviews'
+   },
+   mainText: {
+      news: '/news/:id',
+      article: '/articles/:id',
+      review: '/reviews/:id'
+   },
    infoPage: '/info',
    loginPage: '/auth',
    forgotPassword: '/auth/forgot-password',
@@ -15,5 +24,8 @@ export default {
       drafts: '/user/:login/drafts',
       blog: '/user/:login/blog'
    },
-   adminPage: '/admin/:login'
+   adminPage: '/admin/:login',
+   faq: '/faq',
+   favourites: '/favourites',
+   contacts: '/contacts'
 };
