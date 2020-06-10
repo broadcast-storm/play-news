@@ -4,7 +4,7 @@ import { NavLink, withRouter } from 'react-router-dom';
 import LogOut from '@components/LogOut';
 import Routes from '@config/routes';
 import { getNavbarInfo } from '@actions/firebase';
-import EmptyProfile from '@img/Navbar/empty-logo.png';
+import EmptyProfile from '@img/Navbar/empty-logo.svg';
 import DefaultUserImg from '@img/user/defaultPhoto.png';
 import styles from '@components/Navbar/styles.module.scss';
 
