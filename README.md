@@ -1,6 +1,6 @@
 # Проект "Новостной сайт об игровой индустрии play-news.ru"
 
-![Логотип](LOGO/logo512Round.png)
+![Логотип](LOGO/logoReadme.png)
 
 [Ссылка на дизайн проекта](https://www.figma.com/file/9QVqA5upcSyXHxjpETYZMf/Play-News?node-id=0%3A1 'Ссылка на дизайн проекта')
 
