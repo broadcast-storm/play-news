@@ -1,44 +1,44 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Проект "Новостной сайт об игровой индустрии play-news.ru"
 
-## Available Scripts
+### Описание компонентов системы
 
-In the project directory, you can run:
+В системе существуют следующие роли:
 
-### `yarn start`
+-  Администратор
+-  Редактор
+-  Неавторизированный пользователь
+-  Зарегистрированный и авторизированный пользователь
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+В разработке используется библиотека **React.js** и база данных **Firebase**
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Веб-приложение состоит из следующих страниц (глобальных компонентов):
 
-### `yarn test`
+| Страница    | Описание                                                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Login       | Страница для входа/регистрации в аккаунт пользователя, администратора (для администратора предусмотрена отдельная форма входа) |
+| Info        | Страница с основной информацией о проекте                                                                                      |
+| AdminPage   | Админ панель                                                                                                                   |
+| UserPage    | Личный кабинет пользователя                                                                                                    |
+| Main        | Главная страница со списком последних статей                                                                                   |
+| ArticlePage | Страница с контеном открытой статьи                                                                                            |
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Веб-приложение состоит из следующих компонентов React:
 
-### `yarn build`
+(Каждый компонент веб-приложения откомментирован)
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+| Компонент          | Описание                                                                                                                                                                          |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AboutYourSelf      | Выводит в личном кабинете пользователя информацию в поле "О себе". Если пользователь находится в своем кабинете (и авторизован), то позволяет отредактировать информацию          |
+| AlertPopup         | Выводит передаваемое в него сообщение (ошибку, уведомление и т д)                                                                                                                 |
+| Editor             | Содержит форму для создания статьи (в том числе и экран для предварительного просмотра результата)                                                                                |
+| Footer             | Футер сайта                                                                                                                                                                       |
+| LoadMore           | Кнопка для подгрузки контента (загрузить больше статей или комментариев и т. д.)                                                                                                  |
+| Logo               | Компонент с логотипом сайта (при нажатии отправляет на галнвую страницу)                                                                                                          |
+| LogOut             | Кнопка выхода из личного кабинета                                                                                                                                                 |
+| MainList           | Список со статьями (выводимые статьи меняются в зависимости от передаваемых параметров)                                                                                           |
+| Navbar             | Главное меню сайта (адаптируется в зависимости от разрешения экрана)                                                                                                              |
+| Profile (в Navbar) | Если пользователь авторизован, то содержит основную информацию об аккаунте, сслыку для перехода в личный кабинет и кнопку выхода, иначе предлагаетпользователю зарегистрироваться |
+| NewPhotoPopup      | Форма для изменения основной фотографии профиля (встроенный редактор для обрезки фотографии и предпросмотр результата )                                                           |
+| NewsSlider         | Слайдер со списком новостей                                                                                                                                                       |
+| SideList           | Дополнительный список статей по категориям (распологается справа от MainList)                                                                                                     |
+| UserMenu           | Меню пользователя в личном кабинете                                                                                                                                               |
