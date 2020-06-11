@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Route, Switch, withRouter } from 'react-router-dom';
-import styles from './styles.module.scss';
-import ListItem from './ListItem';
 import { connect } from 'react-redux';
 import { CircleSpinner } from 'react-spinners-kit';
+import ListItem from './ListItem';
+import LoadMore from '@components/LoadMore';
+import Routes from '@config/routes';
+import classNames from 'classnames';
+
 import SendImg from '@img/news/send.svg';
 import SendHoverImg from '@img/news/sendHover.svg';
 import SearchImg from '@img/news/search.png';
 
-import LoadMore from '@components/LoadMore';
-
-import Routes from '@config/routes';
-import classNames from 'classnames';
-
+// Временный массив статей (для разработки)
 import { NewsArray } from '../../mocks/index';
 
-type MainNewsListProps = {
+import styles from './styles.module.scss';
+
+type MainListProps = {
    className?: string | null;
    location: any;
    match: any;
@@ -23,7 +24,7 @@ type MainNewsListProps = {
    navbarInfo: any;
 };
 
-const MainNewsList: React.FC<MainNewsListProps> = ({
+const MainList: React.FC<MainListProps> = ({
    className,
    location,
    match,
@@ -39,11 +40,13 @@ const MainNewsList: React.FC<MainNewsListProps> = ({
 
    const [listIsLoading, setListIsLoading] = useState(true);
 
+   // Изменить тип выводимых статей (написанные читателями или редакторами)
    const clickHandler = (type: string) => {
       setType(type);
    };
    const [userLogin, setUserLogin] = useState(null);
 
+   // Функция загрузки статей
    const loadItems = () => {
       setListIsLoading(true);
       setTimeout(() => {
@@ -52,16 +55,18 @@ const MainNewsList: React.FC<MainNewsListProps> = ({
       }, 400);
    };
 
+   // Начать загрузку статей, когда компонент загружен
    useEffect(() => {
       loadItems();
    }, []);
 
+   // При изменении пути URL (при смене категории статей: обзорыЮ новости и т д) обновлять статьи
    useEffect(() => {
       setListIsLoading(true);
       setItemsList(null);
       loadItems();
    }, [location.pathname]);
-
+   // Если пользователь авторизован, то сохранить его лоигн для добавления в ссылку
    useEffect(() => {
       if (authUser !== null)
          authUser.getIdTokenResult().then((idTokenResult: any) => {
@@ -88,6 +93,8 @@ const MainNewsList: React.FC<MainNewsListProps> = ({
                      читательское
                   </button>
                </div>
+               {/* Если пользователь авторизован, то выводить ссылку ведующую 
+               к редактору в его личном кабинете (вид ссылки меняется в зависимости от типа статей на экране) */}
                {authUser !== null ? (
                   <NavLink
                      to={Routes.userPageScreens.editor.replace(':login', userLogin!)}
@@ -145,6 +152,7 @@ const MainNewsList: React.FC<MainNewsListProps> = ({
                </>
             )}
          </div>
+         {/* В зависимости от кол-ва видимых статей меняется действие функции нажатия на кнопку LOadMore */}
          {listIsLoading ? null : isShowing < itemsList.length ? (
             <LoadMore onClick={() => setIsShowing((prev) => prev + 3)} />
          ) : (
@@ -154,7 +162,7 @@ const MainNewsList: React.FC<MainNewsListProps> = ({
    );
 };
 
-MainNewsList.defaultProps = {
+MainList.defaultProps = {
    className: null
 };
 
@@ -165,4 +173,4 @@ const mapStateToProps = ({ firebase }) => {
    };
 };
 // @ts-ignore
-export default withRouter(connect(mapStateToProps, null)(MainNewsList));
+export default withRouter(connect(mapStateToProps, null)(MainList));

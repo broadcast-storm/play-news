@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import styles from './styles.module.scss';
+import React from 'react';
+import classNames from 'classnames';
+
 import CloseImg from '@img/alert/close.png';
 import CloseWhiteImg from '@img/alert/closeWhite.png';
-import classNames from 'classnames';
+
+import styles from './styles.module.scss';
 
 type AlertPopupProps = {
    className?: string | null;
@@ -19,11 +21,13 @@ const AlertPopup: React.FC<AlertPopupProps> = ({
    status,
    className
 }) => {
+   // В зависимости от передаваемого props выводится popup
    if (!isShow) return null;
 
    return (
       <div className={styles['popupBack']}>
          <div className={classNames(styles['popup'], className)}>
+            {/* Оформление popup меняется от передаваемого props */}
             <div
                className={classNames(
                   styles['status'],

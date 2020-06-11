@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-
 import Routes from '@config/routes';
-
 import { CircleSpinner } from 'react-spinners-kit';
-
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { Redirect } from 'react-router';
-
-import Logo from '@components/Logo';
-
-import styles from './style.module.scss';
-
 import { Alert } from 'react-bootstrap';
 
 import {
@@ -21,11 +13,16 @@ import {
    doSignInAdmin
 } from '@actions/firebase';
 
+// Отдельные компоненты для каждой формы (регистрация, вход в аккаунт и т д)
 import SignIn from './SignIn';
 import SignInAdmin from './Admin';
 import ForgotPassword from './ForgotPassword';
 import Registration from './Registration';
 import VerifyMail from './VerifyMail';
+
+import Logo from '@components/Logo';
+
+import styles from './style.module.scss';
 
 type LoginProps = {
    doSignInWithEmailAndPassword: any;
@@ -58,6 +55,8 @@ const Login: React.FC<LoginProps> = ({
    history,
    initialized
 }) => {
+   //В зависимости от авторизации пользователя и подтвердил ли он свою почту, происходит редирект на его личный кабинет
+   //Если авторизация происходила в форме для админа, то происходит редирект в админ панель
    useEffect(() => {
       if (authUser !== null && initialized) {
          auth.currentUser.getIdTokenResult().then((idTokenResult: any) => {
@@ -66,13 +65,18 @@ const Login: React.FC<LoginProps> = ({
                   if (!auth.currentUser.emailVerified) history.push(Routes.verifyMail);
                   else {
                      if (idTokenResult.claims.loggedAsAdmin && loginSuccess)
-                        setRedirectPath('/admin/' + idTokenResult.claims.login);
+                        setRedirectPath(
+                           Routes.adminPage.replace(':login', idTokenResult.claims.login)
+                        );
                   }
                } else {
                   if (location.pathname === Routes.regist || !auth.currentUser.emailVerified)
                      history.push(Routes.verifyMail);
                   else {
-                     if (loginSuccess) setRedirectPath('/user/' + idTokenResult.claims.login);
+                     if (loginSuccess)
+                        setRedirectPath(
+                           Routes.userPage.replace(':login', idTokenResult.claims.login)
+                        );
                   }
                }
             }
@@ -81,18 +85,21 @@ const Login: React.FC<LoginProps> = ({
       // eslint-disable-next-line
    }, [authUser, loginSuccess, initialized]);
 
+   // Выводить сообщение об изменении пароля, когда отправлено сообщение на почту
    useEffect(() => {
       if (donePasswordReset !== false) {
          setShowPasswAlert(true);
       }
    }, [donePasswordReset]);
 
+   // Если произошла ошибка, то выводить сообщение
    useEffect(() => {
       if (errorSignIn !== null) {
          setShow(true);
       }
    }, [errorSignIn]);
 
+   // При смене Url скрывать все сообщения об ошибках
    useEffect(() => {
       window.scrollTo(0, 0);
       setShow(false);
@@ -105,15 +112,18 @@ const Login: React.FC<LoginProps> = ({
    const [showPasswAlert, setShowPasswAlert] = useState(false);
    const [passwordsCheckWrong, setPasswordsCheckWrong] = useState(false);
 
+   // Функция входа в личный кабинет по почте и паролю
    const loginFunc = (email: string, password: string) => {
       setShow(false);
       doSignInWithEmailAndPassword(email, password);
    };
 
+   // Функция смены пароля (отправить сообщение на почту)
    const forgotPasswFunc = (emailForgotPassw: string) => {
       doPasswordReset(emailForgotPassw);
    };
 
+   // Функция регистрации нового пользователя
    const registrationFunc = (
       login: string,
       name: string,
@@ -131,12 +141,15 @@ const Login: React.FC<LoginProps> = ({
       }
    };
 
+   // Функция входа в админ панель
    const adminFunc = (emailAdmin: string, passwordAdmin: string) => {
       setShow(false);
       doSignInAdmin(emailAdmin, passwordAdmin);
    };
 
+   // Если авторизация прошла, то происходит редирект
    if (redirectPath !== null) return <Redirect to={redirectPath} />;
+
    return (
       <div className={styles['login-page']}>
          <Logo className={styles['login-page__big-logo']} />

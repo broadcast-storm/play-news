@@ -1,5 +1,4 @@
 import React from 'react';
-
 import classNames from 'classnames';
 
 import ArrowImg from '@icons/loadmore/arrow.svg';
@@ -15,6 +14,7 @@ type Props = {
 const LoadMore: React.FC<Props> = ({ className, onClick, reverse }) => {
    return (
       <div className={classNames(styles['container'], className)} onClick={onClick}>
+         {/* В зависимости от передаваемого props.reverse меняется вид кнопки */}
          {reverse ? (
             <>
                <span>Скрыть</span>

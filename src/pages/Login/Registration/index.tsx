@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-
 import Routes from '@config/routes';
-
-import styles from '../style.module.scss';
-
 import { Link, NavLink } from 'react-router-dom';
-
 import { CircleSpinner } from 'react-spinners-kit';
 
 import Vk from '@img/login/vk.png';
@@ -13,13 +8,15 @@ import Facebook from '@img/login/facebook.png';
 import Twitter from '@img/login/twitter.png';
 import Tel from '@img/login/telegram.png';
 
+import styles from '../style.module.scss';
+
 type LoginProps = {
    registrationFunc: any;
    isLoadingSignIn: boolean;
 };
 
+// Форма регистрации
 const Registration: React.FC<LoginProps> = ({ registrationFunc, isLoadingSignIn }) => {
-   // FOR REGISTRATION
    const [login, setLogin] = useState<string>('');
    const [name, setName] = useState<string>('');
    const [surname, setSurname] = useState<string>('');

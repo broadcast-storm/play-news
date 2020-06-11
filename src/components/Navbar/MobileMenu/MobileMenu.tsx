@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import styles from '@components/Navbar/styles.module.scss';
+import Routes from '@config/routes';
 import classNames from 'classnames';
-import Profile from '@components/Navbar/Profile';
+
+import styles from '@components/Navbar/styles.module.scss';
 
 type MobileMenuProps = {
    isOpen: boolean;
@@ -11,7 +12,7 @@ type MobileMenuProps = {
 const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen }) => {
    let shadow = null;
    let menuStyle = styles['mobile-menu'];
-
+   // Мобильное меню выводится вместо основного при нажатии на конпку
    if (isOpen) {
       shadow = <div className={styles['menu-shadow']} />;
       menuStyle = classNames(styles['mobile-menu'], styles['mobile-menu_open']);
@@ -23,37 +24,37 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen }) => {
             <div className={styles['mobile-menu__items']}>
                <NavLink
                   exact
-                  to={'/'}
+                  to={Routes.mainPage}
                   className={classNames(styles['nav-bar__link'], styles['mobile-menu_mobile'])}
                   activeClassName={styles['link-active']}>
                   Новости
                </NavLink>
                <NavLink
-                  to={'/articles'}
+                  to={Routes.mainCategories.articles}
                   className={classNames(styles['nav-bar__link'], styles['mobile-menu_mobile'])}
                   activeClassName={styles['link-active']}>
                   Статьи
                </NavLink>
                <NavLink
-                  to={'/reviews'}
+                  to={Routes.mainCategories.reviews}
                   className={classNames(styles['nav-bar__link'], styles['mobile-menu_mobile'])}
                   activeClassName={styles['link-active']}>
                   Обзоры
                </NavLink>
                <NavLink
-                  to={'/favourites'}
+                  to={Routes.favourites}
                   className={classNames(styles['nav-bar__link'], styles['mobile-menu_mobile'])}
                   activeClassName={styles['link-active']}>
                   Избранное
                </NavLink>
                <NavLink
-                  to={'/faq'}
+                  to={Routes.favourites}
                   className={classNames(styles['nav-bar__link'], styles['mobile-menu_mobile'])}
                   activeClassName={styles['link-active']}>
                   FAQ
                </NavLink>
                <NavLink
-                  to={'/contacts'}
+                  to={Routes.contacts}
                   className={classNames(styles['nav-bar__link'], styles['mobile-menu_mobile'])}
                   activeClassName={styles['link-active']}>
                   Контакты

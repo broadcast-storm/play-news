@@ -1,17 +1,18 @@
 import React from 'react';
 import Routes from '@config/routes';
 import { NavLink } from 'react-router-dom';
-import styles from './styles.module.scss';
 import classNames from 'classnames';
 
-type LogoProps = {
+import styles from './styles.module.scss';
+
+type UserMenuProps = {
    className?: string | null;
    isYourAccount: boolean;
    isRedactor: boolean;
    login: string;
 };
-
-const UserMenu: React.FC<LogoProps> = ({ className, isYourAccount, isRedactor, login }) => {
+// Меню в личном кабинете пользователя (переключает между черновиками, написанными статьями, комментариями и т д)
+const UserMenu: React.FC<UserMenuProps> = ({ className, isYourAccount, isRedactor, login }) => {
    return (
       <div className={classNames(styles['menu-container'], className)}>
          <div className={styles['links']}>
@@ -34,6 +35,8 @@ const UserMenu: React.FC<LogoProps> = ({ className, isYourAccount, isRedactor, l
                activeClassName={styles['link-active']}>
                Комментарии
             </NavLink>
+            {/* В меню добавляются ссылки, в зависимости от того, редактор ли пользователь 
+            и просматривает ли он свой личный кабинет */}
             {isYourAccount ? (
                <NavLink
                   to={Routes.userPageScreens.drafts.replace(':login', login)}

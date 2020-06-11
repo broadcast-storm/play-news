@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import Routes from '@config/routes';
-
 import Profile from '@components/Navbar/Profile';
 import Logo from '@components/Logo';
 import MobileMenu from '@components/Navbar/MobileMenu';
 
-// import Routes from '@config/routes';
-
 import Menu from '@img/Navbar/menu.png';
+
 import styles from './styles.module.scss';
 
 const Navbar: React.FC = () => {
    const [openMobile, setOpenMobile] = useState(false);
-
+   // Функция для открытия мобильного меню
    const openMenuHandler = () => {
       setOpenMobile((prevState) => !prevState);
    };
@@ -50,16 +48,16 @@ const Navbar: React.FC = () => {
 
                <div className={styles['nav-bar__links']}>
                   <NavLink
-                     to={Routes.favourites}
-                     className={styles['nav-bar__link']}
-                     activeClassName={styles['link-active']}>
-                     Избранное
-                  </NavLink>
-                  <NavLink
                      to={Routes.faq}
                      className={styles['nav-bar__link']}
                      activeClassName={styles['link-active']}>
                      FAQ
+                  </NavLink>
+                  <NavLink
+                     to={Routes.infoPage}
+                     className={styles['nav-bar__link']}
+                     activeClassName={styles['link-active']}>
+                     О проекте
                   </NavLink>
                   <NavLink
                      to={Routes.contacts}

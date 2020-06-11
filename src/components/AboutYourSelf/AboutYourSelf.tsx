@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import { CircleSpinner } from 'react-spinners-kit';
 import { changeAboutYourself } from '@actions/firebase';
 import classNames from 'classnames';
-import { CircleSpinner } from 'react-spinners-kit';
 
 import EditImg from '@img/user/edit.png';
 import EditHoverImg from '@img/user/editHover.png';
@@ -30,10 +30,12 @@ const AboutYourSelf: React.FC<AboutYourSelfProps> = ({
    const [submitClicked, setSubmitClicked] = useState(false);
    const [symbolCount, setSymbolCount] = useState(0);
 
+   // Изменение числа введеных букв при каждом изменении в input
    useEffect(() => {
       setSymbolCount(editorValue.length);
    }, [editorValue]);
 
+   // Закрытие редактора после обновления информации о себе
    useEffect(() => {
       if (!userInfoUpdating && submitClicked) {
          setEditorValue(info);
@@ -42,17 +44,18 @@ const AboutYourSelf: React.FC<AboutYourSelfProps> = ({
       }
    }, [userInfoUpdating]);
 
+   // Закрыть редактирование о себе
    const cancelEditor = () => {
       setEditorValue(info);
       setIsChanging(false);
    };
-
+   // Открыть редактор
    const openEditor = () => {
       setEditorValue(info);
       setIsChanging(true);
       setImgUrl(EditImg);
    };
-
+   // Сохранить новую информацию о себе, ждать обновления данных
    const saveNew = (e: any) => {
       e.preventDefault();
       setSubmitClicked(true);
@@ -60,6 +63,7 @@ const AboutYourSelf: React.FC<AboutYourSelfProps> = ({
    };
    return (
       <div className={classNames(styles['aboutContainer'], className)}>
+         {/* Редактор информации "о себе" выводится если нажата кнопка и просматриваемый аккаунт принадлежит пользователю */}
          {isChanging && isYourAccount ? (
             <form className={styles['editor']} onSubmit={saveNew}>
                <textarea

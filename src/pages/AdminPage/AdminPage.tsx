@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import LogOut from '@components/LogOut';
 import { connect } from 'react-redux';
+import { Route, Switch, withRouter } from 'react-router-dom';
 import { CircleSpinner } from 'react-spinners-kit';
 import { getViewedUserInfo } from '@actions/firebase';
 import Routes from '@config/routes';
 import classNames from 'classnames';
+
 import DefaultUserImg from '@img/user/defaultPhoto.png';
-import { Route, Switch, withRouter } from 'react-router-dom';
+
 import styles from './style.module.scss';
 
 type AdminProps = {
@@ -33,7 +35,8 @@ const AdminPage: React.FC<AdminProps> = ({
    viewedUserPhoto
 }) => {
    const [checkAdmin, setCheckAdmin] = useState(false);
-
+   // Перед загрузкой провряется, является ли пользователь админом
+   // и подтверждена ли у него почта (иначе происходит редирект на главную)
    const isAdmin = () => {
       if (auth.currentUser === null) return history.push(Routes.mainPage);
       return auth.currentUser.getIdTokenResult().then((idTokenResult: any) => {
@@ -48,13 +51,14 @@ const AdminPage: React.FC<AdminProps> = ({
       });
    };
 
+   // Когда компонент загружен, начать проверку администратора
    useEffect(() => {
       if (initialized) {
          isAdmin();
       }
       // eslint-disable-next-line
    }, [initialized]);
-
+   // Если пользователь - Админ, то получить его данные
    useEffect(() => {
       if (checkAdmin) {
          getViewedUserInfo(match.params.login);
@@ -62,6 +66,7 @@ const AdminPage: React.FC<AdminProps> = ({
       // eslint-disable-next-line
    }, [checkAdmin]);
 
+   // Пока Админ не проверен и не загружены данные выводить экран загрузки
    if (!checkAdmin || viewedUserLoading)
       return (
          <div className={classNames(styles['userContainer'], styles['containerLoader'])}>

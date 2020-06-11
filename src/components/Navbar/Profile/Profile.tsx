@@ -5,7 +5,9 @@ import LogOut from '@components/LogOut';
 import Routes from '@config/routes';
 import { getNavbarInfo } from '@actions/firebase';
 import EmptyProfile from '@img/Navbar/empty-logo.svg';
+
 import DefaultUserImg from '@img/user/defaultPhoto.png';
+
 import styles from '@components/Navbar/styles.module.scss';
 
 type ProfileProps = {
@@ -14,7 +16,7 @@ type ProfileProps = {
    location?: any;
    authUser?: any;
    getNavbarInfo?: any;
-   initDone: any;
+   initialized?: boolean;
 };
 
 const Profile: React.FC<ProfileProps> = ({
@@ -23,23 +25,27 @@ const Profile: React.FC<ProfileProps> = ({
    location,
    authUser,
    getNavbarInfo,
-   initDone
+   initialized
 }) => {
    const [showInfo, setShowInfo] = useState(false);
 
+   // Если пользователь авторизован, то получить данные для главного меню (фото профиля, ссылку на личный кабинет)
    useEffect(() => {
-      if (authUser !== null && initDone) {
+      if (authUser !== null && initialized) {
          getNavbarInfo();
       }
    }, [authUser]);
 
+   // При смене URL скрывать открываемое меню с данными пользователя
    useEffect(() => {
       setShowInfo(false);
    }, [location.pathname]);
 
+   // если происходит загрузка данных, то показывать заглушку
    if (navbarInfoLoading) {
       return <div className={styles['nav-bar__profile-empty']} />;
    }
+   // если не авторизован, то выводить ссылку на старинцу входа
    if (navbarInfo === null) {
       return (
          <NavLink to={Routes.loginPage} className={styles['nav-bar__profile']}>
@@ -47,6 +53,7 @@ const Profile: React.FC<ProfileProps> = ({
          </NavLink>
       );
    }
+   // елси авторизован и загрузка завершена, то выводить всё
    return (
       <div className={styles['nav-bar__profile']} onClick={() => setShowInfo((prev) => !prev)}>
          <img

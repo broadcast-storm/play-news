@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-
 import { connect } from 'react-redux';
-
 import { doSignOut } from '@actions/firebase';
+import { CircleSpinner } from 'react-spinners-kit';
 
 import styles from '../style.module.scss';
 
-import { CircleSpinner } from 'react-spinners-kit';
-
+// Экран подтверждения почты. Пока пользователь не подтвердит свою почту, он не сможет
+// взаимодействовать и просматривать свой или чужие личные кабинеты. (будет происходить редирект на эту страницу)
 const VerifyMail: React.FC<{ doSignOut: any; verified: boolean }> = ({ doSignOut, verified }) => {
    const [clicked, setClicked] = useState(false);
 

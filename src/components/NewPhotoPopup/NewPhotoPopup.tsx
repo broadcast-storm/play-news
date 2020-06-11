@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { CircleSpinner } from 'react-spinners-kit';
+import { connect } from 'react-redux';
+import { uploadUserPhoto } from '@actions/firebase';
 // @ts-ignore
 import ImageCrop from 'react-image-crop-component';
-import 'react-image-crop-component/style.css';
-
-import { CircleSpinner } from 'react-spinners-kit';
-
-import { connect } from 'react-redux';
-
-import { uploadUserPhoto } from '@actions/firebase';
-
-import styles from './styles.module.scss';
 import classNames from 'classnames';
+
+import 'react-image-crop-component/style.css';
+import styles from './styles.module.scss';
 
 type NewPhotoPopupProps = {
    className?: string | null;
@@ -33,7 +30,7 @@ const NewPhotoPopup: React.FC<NewPhotoPopupProps> = ({
    const [croppedImg, setCroppedImg] = useState<any>(undefined);
 
    const [submitClicked, setSubmitClicked] = useState(false);
-
+   // Очистка формы обновления фото при ее закрытии
    useEffect(() => {
       if (!userInfoUpdating && submitClicked) {
          setShowPhotoPopup(false);
@@ -42,13 +39,13 @@ const NewPhotoPopup: React.FC<NewPhotoPopupProps> = ({
          setSubmitClicked(false);
       }
    }, [userInfoUpdating]);
-
+   // Функция закрытия
    const cancelEditor = () => {
       setShowPhotoPopup(false);
       setPhotoFile('');
       setCroppedImg(undefined);
    };
-
+   // Функция превращения Base64 картинки в файл Blob
    function b64toBlob(dataURI: any) {
       var byteString = atob(dataURI.split(',')[1]);
       var ab = new ArrayBuffer(byteString.length);
@@ -60,6 +57,7 @@ const NewPhotoPopup: React.FC<NewPhotoPopupProps> = ({
       return new Blob([ab], { type: 'image/jpeg' });
    }
 
+   // Загрузка фото (с превращением Base64 в Blob)
    const uploadPhoto = () => {
       if (croppedImg !== undefined) {
          var blob = b64toBlob(croppedImg);
@@ -67,7 +65,7 @@ const NewPhotoPopup: React.FC<NewPhotoPopupProps> = ({
          setSubmitClicked(true);
       }
    };
-
+   // При обрезке фото показать результат
    const onCropped = (e: any) => {
       let image = e.image;
       setCroppedImg(image);

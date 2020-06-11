@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
-
 import Routes from '@config/routes';
+import { NavLink } from 'react-router-dom';
+import { CircleSpinner } from 'react-spinners-kit';
 
 import styles from '../style.module.scss';
-
-import { NavLink } from 'react-router-dom';
-
-import { CircleSpinner } from 'react-spinners-kit';
 
 type LoginProps = {
    forgotPasswFunc: any;
    isLoadingSignIn: boolean;
 };
-
+// Форма для смены пароля
 const ForgotPassword: React.FC<LoginProps> = ({ forgotPasswFunc, isLoadingSignIn }) => {
-   // FOR FORGOT PASSWORD
    const [emailForgotPassw, setEmailForgotPassw] = useState<string>('');
 
    return (

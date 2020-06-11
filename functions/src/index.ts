@@ -7,10 +7,13 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 import * as fs from 'fs-extra';
 
+// FIREBASE ФУНКЦИИ
+
 admin.initializeApp();
 
 const gcs = admin.storage();
 
+// СОЗДАНИЕ ОПТИМИЗИРОВАННЫХ ФОТОГРАФИЙ ПРИ СМЕНЕ ФОТО ПРОФИЛЯ
 exports.generateThumbs = functions.storage.object().onFinalize(async (object, context) => {
    const bucket = gcs.bucket(object.bucket);
    const filePath = object.name;
@@ -185,7 +188,7 @@ exports.saveLogin = functions.https.onCall((data, context) => {
       });
 });
 
-// УСТАНОВКА НАЧАЛЬНЫХ ЗНАЧЕНИЙ
+// УСТАНОВКА НАЧАЛЬНЫХ ЗНАЧЕНИЙ ПРОФИЛЯ
 exports.setInitialInfo = functions.https.onCall((data, context) => {
    if (context.auth?.token.login === undefined) {
       return {

@@ -50,8 +50,7 @@ export function startAuthStateChangeCheck() {
    };
 }
 
-// РЕГИСТРАЦИЯ НОВОГО ПОЛЬЗОВАТЕЛЯ ПО ПОЧТЕ И ПАРОЛЮ
-
+// Функция поиска строки в массиве строк (для поиска используемого уже используемого логина)
 function searchStringInArray(str, strArray) {
    for (var j = 0; j < strArray.length; j++) {
       if (strArray[j].match(str)) return true;
@@ -59,6 +58,7 @@ function searchStringInArray(str, strArray) {
    return false;
 }
 
+// РЕГИСТРАЦИЯ НОВОГО ПОЛЬЗОВАТЕЛЯ ПО ПОЧТЕ И ПАРОЛЮ
 export const doCreateUserWithEmailAndPassword = (login, name, surname, email, password) => {
    return async (dispatch, getState) => {
       const { firebase } = getState();
@@ -191,7 +191,7 @@ export function doSignInAdmin(email, password) {
    };
 }
 
-// ВЫХОД
+// ВЫХОД ИЗ АККАУНТА
 export const doSignOut = () => {
    return async (dispatch, getState) => {
       const { firebase } = getState();
@@ -249,41 +249,7 @@ export function addNewAdmin(email) {
    };
 }
 
-export function areYouAdmin() {
-   return (dispatch, getState) => {
-      const { firebase } = getState();
-
-      firebase.auth.currentUser.getIdTokenResult().then((idTokenResult) => {
-         console.log(idTokenResult);
-         if (idTokenResult.claims.admin === true) return true;
-         else return false;
-      });
-   };
-}
-
-export function reAuthenticate(password) {
-   return async (dispatch, getState) => {
-      const { firebase } = getState();
-      try {
-         const user = firebase.auth.currentUser;
-
-         const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
-
-         await user
-            .reauthenticateWithCredential(credential)
-            .then(function() {
-               console.log('User re-authenticated.');
-            })
-            .catch(function(error) {
-               console.log(error);
-            });
-      } catch (e) {
-         console.log(e);
-      }
-   };
-}
-
-// ЗАГРУЗКА ИНФЫ О ПОЛЬЗОВАТЕЛЕ В NAVBAR
+// ЗАГРУЗКА ИНФОРМАЦИИ О ПОЛЬЗОВАТЕЛЕ В ГЛАВНОЕ МЕНЮ
 export function getNavbarInfo() {
    return (dispatch, getState) => {
       const { firebase } = getState();
@@ -408,7 +374,7 @@ export function clearViewedUserInfo() {
    };
 }
 
-// ИЗМЕНИТЬ ТЕКСТ О СЕБЕ
+// ИЗМЕНИТЬ ТЕКСТ "О СЕБЕ"
 export function changeAboutYourself(text) {
    return (dispatch, getState) => {
       const { firebase } = getState();

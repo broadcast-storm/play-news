@@ -1,13 +1,9 @@
 import React from 'react';
-
 // @ts-ignore
 import Slider from 'react-slick';
-
-import classNames from 'classnames';
-
 import { NavLink } from 'react-router-dom';
-
 import Arrow from './Arrow';
+import classNames from 'classnames';
 
 import EyeImg from '@img/news/eye.png';
 
@@ -29,6 +25,7 @@ type NewsItem = {
 };
 
 const NewsSlider: React.FC<Props> = ({ className, NewsArray, header }) => {
+   // Настройки слайдера (адаптивность, ленивая загрузка и т д)
    const settings = {
       dots: false,
       infinite: true,

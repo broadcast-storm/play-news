@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
-
 import Routes from '@config/routes';
+import { NavLink } from 'react-router-dom';
+import { CircleSpinner } from 'react-spinners-kit';
 
 import styles from '../style.module.scss';
-
-import { NavLink } from 'react-router-dom';
-
-import { CircleSpinner } from 'react-spinners-kit';
 
 type LoginProps = {
    isLoadingSignIn: boolean;
    adminFunc: any;
 };
 
+// Форма входа администратора
 const SignInAdmin: React.FC<LoginProps> = ({ isLoadingSignIn, adminFunc }) => {
-   // FOR ADMIN
    const [emailAdmin, setEmailAdmin] = useState<string>('');
    const [passwordAdmin, setPasswordAdmin] = useState<string>('');
 

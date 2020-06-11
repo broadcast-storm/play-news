@@ -1,3 +1,4 @@
+// Список всех Url путей
 export default {
    mainPage: '/',
    mainCategories: {

@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-
 import Routes from '@config/routes';
-
-import styles from '../style.module.scss';
-
 import { Link, NavLink } from 'react-router-dom';
-
 import { CircleSpinner } from 'react-spinners-kit';
 
 import Vk from '@img/login/vk.png';
@@ -13,13 +8,15 @@ import Facebook from '@img/login/facebook.png';
 import Twitter from '@img/login/twitter.png';
 import Tel from '@img/login/telegram.png';
 
+import styles from '../style.module.scss';
+
 type LoginProps = {
    loginFunc: any;
    isLoadingSignIn: boolean;
 };
 
+// Форма входа в аккаунт
 const SignIn: React.FC<LoginProps> = ({ loginFunc, isLoadingSignIn }) => {
-   // FOR LOGIN
    const [email, setEmail] = useState<string>('');
    const [password, setPassword] = useState<string>('');
 

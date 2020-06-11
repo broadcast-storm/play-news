@@ -27,6 +27,7 @@ const LogOut: React.FC<LogOutProps> = ({ className, doSignOut }) => {
             setTextStyle(styles['logout__text']);
          }}
          className={classNames(styles['logout'], className)}
+         // При нажатии на кнопку сначал происходит выход из аккаунта, а затем перезагрузка страницы
          onClick={async () => {
             await doSignOut();
             window.location.reload(false);

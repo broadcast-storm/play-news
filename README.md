@@ -1,5 +1,7 @@
 # Проект "Новостной сайт об игровой индустрии play-news.ru"
 
+![](https://github.com/nikita220800/play-news/tree/master/LOGO/logo512Round.png)
+
 ### Описание компонентов системы
 
 В системе существуют следующие роли:

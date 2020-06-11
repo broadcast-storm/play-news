@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
+import classNames from 'classnames';
+import { NavLink } from 'react-router-dom';
+
+// Необходимые библиотеки для редактора статьи
 import { Editor } from 'react-draft-wysiwyg';
 import { EditorState, convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import htmlToDraft from 'html-to-draftjs';
 // @ts-ignore
 import toHtml from 'string-to-html';
+
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { NavLink } from 'react-router-dom';
 import styles from './styles.module.scss';
-import classNames from 'classnames';
 
 type EditorArticleProps = {
    className?: string | null;
@@ -18,10 +21,12 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
    const [editorState, setEditorState] = useState<any>(EditorState.createEmpty());
    const [resultArticle, setResultArticle] = useState<any>('');
 
+   // При изменении текста в редакторе происходит преобразование текста в HTML код и выводится результат
    useEffect(() => {
       setResultArticle(toHtml(draftToHtml(convertToRaw(editorState.getCurrentContent()))));
    }, [editorState]);
 
+   // Обновление (очистка) выводимого резульата
    useEffect(() => {
       if (resultArticle !== null) {
          const result = document.getElementById('articleResult');
@@ -32,23 +37,24 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
       }
    }, [resultArticle]);
 
+   // Преобразование добавленой картинки в Base64
    const getFileBase64 = (file: any, callback: any) => {
       var reader = new FileReader();
 
       reader.readAsDataURL(file);
       reader.onload = () => {
-         console.log(reader.result);
          return callback(reader.result);
       };
       // TODO: catch an error
       reader.onerror = (error) => {};
    };
 
+   // Функция добавления картинки
    const imageUploadCallback = (file: any) =>
       new Promise((resolve, reject) =>
          getFileBase64(file, (data: any) => resolve({ data: { link: data } }))
       );
-
+   //Отправить написанную статью (редактору, если обычный пользователь и сразу на сайт, если редактор)
    const sendArticle = (e: any) => {
       e.preventDefault();
    };
