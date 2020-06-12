@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Загрузка и отображение <AboutYourSelf /> should match the snapshot 1`] = `"<div class=\\"aboutContainer\\"><div class=\\"text\\"><span class=\\"text__info\\"></span></div></div>"`;
+
+exports[`Загрузка и отображение <AboutYourSelf /> Рендеринг компонента <AboutYourSelf /> произошел успешно 1`] = `"<div class=\\"aboutContainer\\"><div class=\\"text\\"><span class=\\"text__info\\"></span></div></div>"`;
