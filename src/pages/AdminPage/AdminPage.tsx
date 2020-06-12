@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import LogOut from '@components/LogOut';
 import { connect } from 'react-redux';
-import { Route, Switch, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { CircleSpinner } from 'react-spinners-kit';
 import { getViewedUserInfo } from '@actions/firebase';
 import Routes from '@config/routes';

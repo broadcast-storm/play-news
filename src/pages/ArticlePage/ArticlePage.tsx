@@ -4,7 +4,7 @@ import styles from './style.module.scss';
 
 const ArticlePage: React.FC = () => {
    return (
-      <div>
+      <div className={styles['article-main-contaainer']}>
          <div className="jumbotron bg-white">
             <div className="container">
                <h3 className="display-8">Текст статьи</h3>

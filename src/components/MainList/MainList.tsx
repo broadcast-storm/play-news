@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Route, Switch, withRouter } from 'react-router-dom';
+import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { CircleSpinner } from 'react-spinners-kit';
 import ListItem from './ListItem';
 import LoadMore from '@components/LoadMore';
 import Routes from '@config/routes';
-import classNames from 'classnames';
 
 import SendImg from '@img/news/send.svg';
 import SendHoverImg from '@img/news/sendHover.svg';

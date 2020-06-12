@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import classNames from 'classnames';
-
-import SendImg from '@img/news/sendNews.png';
+// import { NavLink } from 'react-router-dom';
+// import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 

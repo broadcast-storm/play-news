@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import { NavLink } from 'react-router-dom';
 
 // Необходимые библиотеки для редактора статьи
 import { Editor } from 'react-draft-wysiwyg';
 import { EditorState, convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
+// eslint-disable-next-line
 import htmlToDraft from 'html-to-draftjs';
 // @ts-ignore
 import toHtml from 'string-to-html';

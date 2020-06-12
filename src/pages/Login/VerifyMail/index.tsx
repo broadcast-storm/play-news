@@ -16,6 +16,7 @@ const VerifyMail: React.FC<{ doSignOut: any; verified: boolean }> = ({ doSignOut
             doSignOut();
          }
       };
+      // eslint-disable-next-line
    }, []);
 
    return (

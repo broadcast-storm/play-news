@@ -34,11 +34,13 @@ const Profile: React.FC<ProfileProps> = ({
       if (authUser !== null && initialized) {
          getNavbarInfo();
       }
+      // eslint-disable-next-line
    }, [authUser]);
 
    // При смене URL скрывать открываемое меню с данными пользователя
    useEffect(() => {
       setShowInfo(false);
+      // eslint-disable-next-line
    }, [location.pathname]);
 
    // если происходит загрузка данных, то показывать заглушку

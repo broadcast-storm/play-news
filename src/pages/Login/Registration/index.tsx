@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Routes from '@config/routes';
 import { Link, NavLink } from 'react-router-dom';
 import { CircleSpinner } from 'react-spinners-kit';
@@ -44,7 +44,7 @@ class Registration extends React.Component<
 
    submitFunc = (e?: any) => {
       if (e !== undefined) e.preventDefault();
-      const { emailReg, passwordReg, isValid, login, name, surname, passwordRegCheck } = this.state;
+      const { emailReg, passwordReg, login, name, surname, passwordRegCheck } = this.state;
       var regexpEmail = /[^@\s]+@[^@\s]+\.[^@\s]+$/;
       var regexpPassword = /(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*/;
       var regexpLogin = /[a-zA-Z0-9_]{5,}$/;
@@ -65,8 +65,8 @@ class Registration extends React.Component<
    };
 
    render() {
-      const { registrationFunc, isLoadingSignIn } = this.props;
-      const { emailReg, passwordReg, isValid, login, name, surname, passwordRegCheck } = this.state;
+      const { isLoadingSignIn } = this.props;
+      const { emailReg, passwordReg, login, name, surname, passwordRegCheck } = this.state;
       return (
          <>
             <form className={styles['login-page__login-form']} onSubmit={this.submitFunc}>

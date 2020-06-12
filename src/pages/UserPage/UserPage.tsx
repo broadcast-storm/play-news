@@ -9,7 +9,6 @@ import AlertPopup from '@components/AlertPopup';
 import UserMenu from '@components/UserMenu';
 import EditorArticle from '@components/Editor';
 import { Route, Switch, withRouter } from 'react-router-dom';
-import { Redirect } from 'react-router';
 import classNames from 'classnames';
 
 import { clearViewedUserInfo, getViewedUserInfo } from '@actions/firebase';
@@ -121,6 +120,7 @@ const UserPage: React.FC<UserProps> = ({
          setUrlChanged(true);
          clearViewedUserInfo();
       };
+      // eslint-disable-next-line
    }, []);
 
    useEffect(() => {
@@ -128,6 +128,7 @@ const UserPage: React.FC<UserProps> = ({
       if (initialized) {
          isYourAccount();
       }
+      // eslint-disable-next-line
    }, [match.params.login, initialized]);
 
    if (viewedUserLoading || urlChanged)

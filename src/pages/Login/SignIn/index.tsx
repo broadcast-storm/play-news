@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Routes from '@config/routes';
 import { Link, NavLink } from 'react-router-dom';
 import { CircleSpinner } from 'react-spinners-kit';
@@ -39,8 +39,8 @@ class SignIn extends React.Component<
    };
 
    render() {
-      const { loginFunc, isLoadingSignIn } = this.props;
-      const { email, password, logedIn } = this.state;
+      const { isLoadingSignIn } = this.props;
+      const { email, password } = this.state;
       return (
          <>
             <form className={styles['login-page__login-form']} onSubmit={this.submitFunc}>

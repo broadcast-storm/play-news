@@ -33,6 +33,7 @@ const AboutYourSelf: React.FC<AboutYourSelfProps> = ({
    // Изменение числа введеных букв при каждом изменении в input
    useEffect(() => {
       setSymbolCount(editorValue.length);
+      // eslint-disable-next-line
    }, [editorValue]);
 
    // Закрытие редактора после обновления информации о себе
@@ -42,6 +43,7 @@ const AboutYourSelf: React.FC<AboutYourSelfProps> = ({
          setIsChanging(false);
          setSubmitClicked(false);
       }
+      // eslint-disable-next-line
    }, [userInfoUpdating]);
 
    // Закрыть редактирование о себе

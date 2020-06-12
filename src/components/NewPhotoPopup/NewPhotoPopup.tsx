@@ -38,13 +38,16 @@ const NewPhotoPopup: React.FC<NewPhotoPopupProps> = ({
          setCroppedImg(undefined);
          setSubmitClicked(false);
       }
+      // eslint-disable-next-line
    }, [userInfoUpdating]);
+
    // Функция закрытия
    const cancelEditor = () => {
       setShowPhotoPopup(false);
       setPhotoFile('');
       setCroppedImg(undefined);
    };
+
    // Функция превращения Base64 картинки в файл Blob
    function b64toBlob(dataURI: any) {
       var byteString = atob(dataURI.split(',')[1]);
