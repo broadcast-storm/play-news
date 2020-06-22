@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Routes from '@config/routes';
 import { CircleSpinner } from 'react-spinners-kit';
 import { Route, Switch, withRouter } from 'react-router-dom';
@@ -25,36 +25,22 @@ import Logo from '@components/Logo';
 import styles from './style.module.scss';
 
 type LoginProps = {
-   doSignInWithEmailAndPassword: any;
-   doCreateUserWithEmailAndPassword: any;
-   doPasswordReset: any;
-   isLoadingSignIn: boolean;
-   errorSignIn: any;
-   donePasswordReset: boolean;
-   doSignInAdmin: any;
-   loginSuccess: boolean;
    location: any;
-   auth: any;
-   authUser: any;
    history: any;
-   initialized: boolean;
 };
 
-const Login: React.FC<LoginProps> = ({
-   doSignInWithEmailAndPassword,
-   doCreateUserWithEmailAndPassword,
-   doPasswordReset,
-   errorSignIn,
-   donePasswordReset,
-   doSignInAdmin,
-   loginSuccess,
-   isLoadingSignIn,
-   location,
-   auth,
-   authUser,
-   history,
-   initialized
-}) => {
+const Login: React.FC<LoginProps> = ({ location, history }) => {
+   const dispatch = useDispatch();
+   const {
+      auth,
+      authUser,
+      initialized,
+      loginSuccess,
+      errorSignIn,
+      donePasswordReset,
+      isLoadingSignIn
+   } = useSelector((state: any) => state.firebase);
+
    //В зависимости от авторизации пользователя и подтвердил ли он свою почту, происходит редирект на его личный кабинет
    //Если авторизация происходила в форме для админа, то происходит редирект в админ панель
    useEffect(() => {
@@ -115,12 +101,12 @@ const Login: React.FC<LoginProps> = ({
    // Функция входа в личный кабинет по почте и паролю
    const loginFunc = (email: string, password: string) => {
       setShow(false);
-      doSignInWithEmailAndPassword(email, password);
+      dispatch(doSignInWithEmailAndPassword(email, password));
    };
 
    // Функция смены пароля (отправить сообщение на почту)
    const forgotPasswFunc = (emailForgotPassw: string) => {
-      doPasswordReset(emailForgotPassw);
+      dispatch(doPasswordReset(emailForgotPassw));
    };
 
    // Функция регистрации нового пользователя
@@ -134,7 +120,7 @@ const Login: React.FC<LoginProps> = ({
    ) => {
       setShow(false);
       if (passwordReg === passwordRegCheck) {
-         doCreateUserWithEmailAndPassword(login, name, surname, emailReg, passwordReg);
+         dispatch(doCreateUserWithEmailAndPassword(login, name, surname, emailReg, passwordReg));
       } else {
          setPasswordsCheckWrong(true);
          setShow(true);
@@ -144,7 +130,7 @@ const Login: React.FC<LoginProps> = ({
    // Функция входа в админ панель
    const adminFunc = (emailAdmin: string, passwordAdmin: string) => {
       setShow(false);
-      doSignInAdmin(emailAdmin, passwordAdmin);
+      dispatch(doSignInAdmin(emailAdmin, passwordAdmin));
    };
 
    // Если авторизация прошла, то происходит редирект
@@ -228,26 +214,4 @@ const Login: React.FC<LoginProps> = ({
 };
 
 // @ts-ignore
-const mapStateToProps = ({ firebase }) => {
-   return {
-      ...firebase
-   };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-   return {
-      doSignInWithEmailAndPassword: (email: string, password: string) =>
-         dispatch(doSignInWithEmailAndPassword(email, password)),
-      doSignInAdmin: (email: string, password: string) => dispatch(doSignInAdmin(email, password)),
-      doPasswordReset: (email: string) => dispatch(doPasswordReset(email)),
-      doCreateUserWithEmailAndPassword: (
-         login: string,
-         name: string,
-         surname: string,
-         email: string,
-         password: string
-      ) => dispatch(doCreateUserWithEmailAndPassword(login, name, surname, email, password))
-   };
-};
-// @ts-ignore
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Login));
+export default withRouter(Login);

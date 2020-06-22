@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { doSignOut } from '@actions/firebase';
 import { CircleSpinner } from 'react-spinners-kit';
 
@@ -7,13 +7,14 @@ import styles from '../style.module.scss';
 
 // Экран подтверждения почты. Пока пользователь не подтвердит свою почту, он не сможет
 // взаимодействовать и просматривать свой или чужие личные кабинеты. (будет происходить редирект на эту страницу)
-const VerifyMail: React.FC<{ doSignOut: any; verified: boolean }> = ({ doSignOut, verified }) => {
+const VerifyMail: React.FC<{ verified: boolean }> = ({ verified }) => {
+   const dispatch = useDispatch();
    const [clicked, setClicked] = useState(false);
 
    useEffect(() => {
       return () => {
          if (!clicked && !verified) {
-            doSignOut();
+            dispatch(doSignOut());
          }
       };
       // eslint-disable-next-line
@@ -41,10 +42,4 @@ const VerifyMail: React.FC<{ doSignOut: any; verified: boolean }> = ({ doSignOut
    );
 };
 
-const mapDispatchToProps = (dispatch: any) => {
-   return {
-      doSignOut: () => dispatch(doSignOut())
-   };
-};
-
-export default connect(null, mapDispatchToProps)(VerifyMail);
+export default VerifyMail;

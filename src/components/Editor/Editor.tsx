@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
+import Article from '@components/Article';
 // Необходимые библиотеки для редактора статьи
 import { Editor } from 'react-draft-wysiwyg';
 import { EditorState, convertToRaw } from 'draft-js';
-import draftToHtml from 'draftjs-to-html';
+
 // eslint-disable-next-line
 import htmlToDraft from 'html-to-draftjs';
-// @ts-ignore
-import toHtml from 'string-to-html';
 
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import styles from './styles.module.scss';
@@ -20,22 +19,12 @@ type EditorArticleProps = {
 const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
    const [editorState, setEditorState] = useState<any>(EditorState.createEmpty());
    const [resultArticle, setResultArticle] = useState<any>('');
+   const [showResult, setShowResult] = useState(false);
 
    // При изменении текста в редакторе происходит преобразование текста в HTML код и выводится результат
    useEffect(() => {
-      setResultArticle(toHtml(draftToHtml(convertToRaw(editorState.getCurrentContent()))));
+      setResultArticle(convertToRaw(editorState.getCurrentContent()));
    }, [editorState]);
-
-   // Обновление (очистка) выводимого резульата
-   useEffect(() => {
-      if (resultArticle !== null) {
-         const result = document.getElementById('articleResult');
-         if (result !== null) {
-            result.innerHTML = '';
-            result.append(resultArticle);
-         }
-      }
-   }, [resultArticle]);
 
    // Преобразование добавленой картинки в Base64
    const getFileBase64 = (file: any, callback: any) => {
@@ -58,9 +47,16 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
    const sendArticle = (e: any) => {
       e.preventDefault();
    };
+
    return (
       <div className={classNames(styles['editor-container'], className)}>
-         <form onSubmit={sendArticle} className={styles['form']}>
+         <div>
+            <button onClick={() => setShowResult(false)}>Редактор</button>
+            <button onClick={() => setShowResult(true)}>Результат</button>
+         </div>
+         <form
+            onSubmit={sendArticle}
+            className={classNames(styles['form'], showResult ? styles['form-hidden'] : null)}>
             <input
                type="text"
                className={styles['input']}
@@ -75,17 +71,66 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
                editorClassName={styles['editor-input']}
                onEditorStateChange={setEditorState}
                toolbar={{
+                  options: [
+                     'inline',
+                     'blockType',
+                     'fontSize',
+                     'fontFamily',
+                     'list',
+                     'colorPicker',
+                     'link',
+                     'embedded',
+                     'emoji',
+                     'image',
+                     'history'
+                  ],
+
+                  inline: {
+                     className: undefined,
+                     component: undefined,
+                     dropdownClassName: undefined,
+                     options: [
+                        'bold',
+                        'italic',
+                        'underline',
+                        'strikethrough',
+                        'superscript',
+                        'subscript'
+                     ]
+                  },
+
+                  blockType: {
+                     options: ['Normal', 'H2', 'H3', 'H4', 'H5', 'H6', 'Blockquote', 'Code']
+                  },
+
+                  fontSize: {
+                     options: [10, 11, 12, 14, 16, 18, 24, 30, 36]
+                  },
+
+                  list: {
+                     className: undefined,
+                     component: undefined,
+                     options: ['unordered', 'ordered']
+                  },
+
                   image: {
                      uploadCallback: imageUploadCallback,
-                     previewImage: true
+                     previewImage: true,
+                     alignmentEnabled: false,
+                     defaultSize: {
+                        height: 'auto',
+                        width: 'auto'
+                     }
                   }
                }}
                placeholder={'Текст статьи'}
             />
          </form>
-         <h2>Результат</h2>
-         <br />
-         <div id="articleResult" className={styles['Article']}></div>
+         {showResult ? (
+            <div style={{ width: '75%', border: '1px solid black' }}>
+               <Article content={resultArticle} />
+            </div>
+         ) : null}
       </div>
    );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { CircleSpinner } from 'react-spinners-kit';
 import LogOut from '@components/LogOut';
 import AboutYourSelf from '@components/AboutYourSelf';
@@ -21,32 +21,20 @@ import UploadPhotoImg from '@img/user/uploadPhoto.png';
 type UserProps = {
    location: any;
    match: any;
-   auth: any;
-   authUser: any;
    history: any;
-   initialized: boolean;
-   clearViewedUserInfo: any;
-   getViewedUserInfo: any;
-   viewedUserLoading: boolean;
-   viewedUserOpenInfo: any;
-   viewedUserSecureInfo: any;
-   viewedUserPhoto: any;
 };
 
-const UserPage: React.FC<UserProps> = ({
-   location,
-   match,
-   auth,
-   authUser,
-   history,
-   initialized,
-   clearViewedUserInfo,
-   getViewedUserInfo,
-   viewedUserLoading,
-   viewedUserOpenInfo,
-   viewedUserSecureInfo,
-   viewedUserPhoto
-}) => {
+const UserPage: React.FC<UserProps> = ({ location, match, history }) => {
+   const dispatch = useDispatch();
+   const {
+      auth,
+      initialized,
+      viewedUserLoading,
+      viewedUserOpenInfo,
+      viewedUserSecureInfo,
+      viewedUserPhoto
+   } = useSelector((state: any) => state.firebase);
+
    const photoInput = useRef(null);
 
    const [isRedactor, setIsRedactor] = useState(false);
@@ -80,7 +68,7 @@ const UserPage: React.FC<UserProps> = ({
             } else {
                setCheckYourAccount(false);
             }
-            getViewedUserInfo(match.params.login);
+            dispatch(getViewedUserInfo(match.params.login));
             setUrlChanged(false);
          })();
       }
@@ -118,7 +106,7 @@ const UserPage: React.FC<UserProps> = ({
    useEffect(() => {
       return () => {
          setUrlChanged(true);
-         clearViewedUserInfo();
+         dispatch(clearViewedUserInfo());
       };
       // eslint-disable-next-line
    }, []);
@@ -252,18 +240,4 @@ const UserPage: React.FC<UserProps> = ({
 };
 
 // @ts-ignore
-const mapStateToProps = ({ firebase }) => {
-   return {
-      ...firebase
-   };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-   return {
-      getViewedUserInfo: (login: string) => dispatch(getViewedUserInfo(login)),
-      clearViewedUserInfo: () => dispatch(clearViewedUserInfo())
-   };
-};
-
-// @ts-ignore
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(UserPage));
+export default withRouter(UserPage);

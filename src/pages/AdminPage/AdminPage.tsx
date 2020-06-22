@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LogOut from '@components/LogOut';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { CircleSpinner } from 'react-spinners-kit';
 import { getViewedUserInfo } from '@actions/firebase';
@@ -13,28 +13,21 @@ import styles from './style.module.scss';
 
 type AdminProps = {
    match: any;
-   auth: any;
-   initialized: boolean;
    history: any;
-   getViewedUserInfo?: any;
-   viewedUserLoading?: boolean;
-   viewedUserOpenInfo?: any;
-   viewedUserSecureInfo?: any;
-   viewedUserPhoto?: any;
 };
 
-const AdminPage: React.FC<AdminProps> = ({
-   auth,
-   match,
-   initialized,
-   history,
-   getViewedUserInfo,
-   viewedUserLoading,
-   viewedUserOpenInfo,
-   viewedUserSecureInfo,
-   viewedUserPhoto
-}) => {
+const AdminPage: React.FC<AdminProps> = ({ match, history }) => {
+   const dispatch = useDispatch();
+   const {
+      auth,
+      initialized,
+      viewedUserLoading,
+      viewedUserOpenInfo,
+      viewedUserPhoto
+   } = useSelector((state: any) => state.firebase);
+
    const [checkAdmin, setCheckAdmin] = useState(false);
+
    // Перед загрузкой провряется, является ли пользователь админом
    // и подтверждена ли у него почта (иначе происходит редирект на главную)
    const isAdmin = () => {
@@ -61,7 +54,7 @@ const AdminPage: React.FC<AdminProps> = ({
    // Если пользователь - Админ, то получить его данные
    useEffect(() => {
       if (checkAdmin) {
-         getViewedUserInfo(match.params.login);
+         dispatch(getViewedUserInfo(match.params.login));
       }
       // eslint-disable-next-line
    }, [checkAdmin]);
@@ -106,15 +99,4 @@ const AdminPage: React.FC<AdminProps> = ({
 };
 
 // @ts-ignore
-const mapStateToProps = ({ firebase }) => {
-   return {
-      ...firebase
-   };
-};
-const mapDispatchToProps = (dispatch: any) => {
-   return {
-      getViewedUserInfo: (login: string) => dispatch(getViewedUserInfo(login))
-   };
-};
-// @ts-ignore
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AdminPage));
+export default withRouter(AdminPage);

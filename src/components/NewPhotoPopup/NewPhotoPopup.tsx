@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CircleSpinner } from 'react-spinners-kit';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { uploadUserPhoto } from '@actions/firebase';
 // @ts-ignore
 import ImageCrop from 'react-image-crop-component';
@@ -15,21 +15,21 @@ type NewPhotoPopupProps = {
    photoFile: any;
    setPhotoFile: any;
    setShowPhotoPopup: any;
-   uploadUserPhoto?: any;
-   userInfoUpdating?: boolean;
 };
 
 const NewPhotoPopup: React.FC<NewPhotoPopupProps> = ({
    isShow,
    photoFile,
    setShowPhotoPopup,
-   setPhotoFile,
-   uploadUserPhoto,
-   userInfoUpdating
+   setPhotoFile
 }) => {
+   const dispatch = useDispatch();
+   const { userInfoUpdating } = useSelector((state: any) => state.firebase);
+
    const [croppedImg, setCroppedImg] = useState<any>(undefined);
 
    const [submitClicked, setSubmitClicked] = useState(false);
+
    // Очистка формы обновления фото при ее закрытии
    useEffect(() => {
       if (!userInfoUpdating && submitClicked) {
@@ -64,7 +64,7 @@ const NewPhotoPopup: React.FC<NewPhotoPopupProps> = ({
    const uploadPhoto = () => {
       if (croppedImg !== undefined) {
          var blob = b64toBlob(croppedImg);
-         uploadUserPhoto(blob);
+         dispatch(uploadUserPhoto(blob));
          setSubmitClicked(true);
       }
    };
@@ -141,23 +141,10 @@ const NewPhotoPopup: React.FC<NewPhotoPopupProps> = ({
    );
 };
 
-// @ts-ignore
-const mapStateToProps = ({ firebase }) => {
-   return {
-      ...firebase
-   };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-   return {
-      uploadUserPhoto: (imageBlob: any) => dispatch(uploadUserPhoto(imageBlob))
-   };
-};
-
 NewPhotoPopup.defaultProps = {
    className: null,
    isShow: false,
    photoFile: null
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewPhotoPopup);
+export default NewPhotoPopup;

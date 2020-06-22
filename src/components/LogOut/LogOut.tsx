@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { doSignOut } from '@actions/firebase';
 import classNames from 'classnames';
 
@@ -10,10 +10,11 @@ import styles from './styles.module.scss';
 
 type LogOutProps = {
    className?: string | null;
-   doSignOut?: any;
 };
 
-const LogOut: React.FC<LogOutProps> = ({ className, doSignOut }) => {
+const LogOut: React.FC<LogOutProps> = ({ className }) => {
+   const dispatch = useDispatch();
+
    const [imgUrl, setImgUrl] = useState(LogoutImg);
    const [textStyle, setTextStyle] = useState(styles['logout__text']);
    return (
@@ -29,7 +30,7 @@ const LogOut: React.FC<LogOutProps> = ({ className, doSignOut }) => {
          className={classNames(styles['logout'], className)}
          // При нажатии на кнопку сначал происходит выход из аккаунта, а затем перезагрузка страницы
          onClick={async () => {
-            await doSignOut();
+            await dispatch(doSignOut());
             window.location.reload(false);
          }}>
          <span className={textStyle}>Выход</span>
@@ -42,11 +43,4 @@ LogOut.defaultProps = {
    className: null
 };
 
-const mapDispatchToProps = (dispatch: any) => {
-   return {
-      doSignOut: () => dispatch(doSignOut())
-   };
-};
-
-// @ts-ignore
-export default connect(null, mapDispatchToProps)(LogOut);
+export default LogOut;

@@ -3,7 +3,7 @@ import 'firebase/auth';
 import 'firebase/database';
 import { firebaseInit, startAuthStateChangeCheck } from '@actions/firebase';
 
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Navbar from '@components/Navbar';
 import Routes from '@config/routes';
 import { Route, Switch, withRouter } from 'react-router-dom';
@@ -24,17 +24,20 @@ import 'slick-carousel/slick/slick-theme.css';
 import styles from './style.module.scss';
 
 // @ts-ignore
-const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, initDone }) => {
+const App: React.FC = ({ location }) => {
+   const dispatch = useDispatch();
+   const { initDone } = useSelector((state: any) => state.firebase);
+
    // Инициализировать firebase в приложении
    useEffect(() => {
-      firebaseInit();
+      dispatch(firebaseInit());
       // eslint-disable-next-line
    }, []);
 
    // Когда произошла инициализация firebase, проверить, авторизован ли пользователь
    useEffect(() => {
       if (initDone) {
-         startAuthStateChangeCheck();
+         dispatch(startAuthStateChangeCheck());
       }
       // eslint-disable-next-line
    }, [initDone]);
@@ -86,20 +89,4 @@ const App: React.FC = ({ location, firebaseInit, startAuthStateChangeCheck, init
 };
 
 // @ts-ignore
-const mapStateToProps = ({ firebase }) => {
-   return {
-      ...firebase
-   };
-};
-
-const mapDispatchToProps = (
-   dispatch: (arg0: (dispatch: any, getState: any) => Promise<void>) => any
-) => {
-   return {
-      firebaseInit: () => dispatch(firebaseInit()),
-      startAuthStateChangeCheck: () => dispatch(startAuthStateChangeCheck())
-   };
-};
-
-// @ts-ignore
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));
+export default withRouter(App);

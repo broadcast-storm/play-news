@@ -1,38 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { NavLink, withRouter } from 'react-router-dom';
 import LogOut from '@components/LogOut';
 import Routes from '@config/routes';
-import { getNavbarInfo } from '@actions/firebase';
-import EmptyProfile from '@img/Navbar/empty-logo.svg';
 
+import { getNavbarInfo } from '@actions/firebase';
+
+import EmptyProfile from '@img/Navbar/empty-logo.svg';
 import DefaultUserImg from '@img/user/defaultPhoto.png';
 
 import styles from '@components/Navbar/styles.module.scss';
 
 type ProfileProps = {
-   navbarInfoLoading?: boolean;
-   navbarInfo?: any;
    location?: any;
-   authUser?: any;
-   getNavbarInfo?: any;
-   initialized?: boolean;
 };
 
-const Profile: React.FC<ProfileProps> = ({
-   navbarInfoLoading,
-   navbarInfo,
-   location,
-   authUser,
-   getNavbarInfo,
-   initialized
-}) => {
+const Profile: React.FC<ProfileProps> = ({ location }) => {
+   const dispatch = useDispatch();
+   const { navbarInfo, navbarInfoLoading, authUser, initialized } = useSelector(
+      (state: any) => state.firebase
+   );
+
    const [showInfo, setShowInfo] = useState(false);
 
    // Если пользователь авторизован, то получить данные для главного меню (фото профиля, ссылку на личный кабинет)
    useEffect(() => {
       if (authUser !== null && initialized) {
-         getNavbarInfo();
+         dispatch(getNavbarInfo());
       }
       // eslint-disable-next-line
    }, [authUser]);
@@ -88,17 +82,4 @@ const Profile: React.FC<ProfileProps> = ({
 };
 
 // @ts-ignore
-const mapStateToProps = ({ firebase }) => {
-   return {
-      ...firebase
-   };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-   return {
-      getNavbarInfo: () => dispatch(getNavbarInfo())
-   };
-};
-
-// @ts-ignore
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Profile));
+export default withRouter(Profile);
