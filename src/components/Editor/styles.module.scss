@@ -1,5 +1,25 @@
 .editor-container {
    width: 100%;
+   .switch-btns {
+      display: flex;
+      justify-content: flex-start;
+      .btn {
+         font-weight: 600;
+         display: block;
+         border: none;
+         background-color: rgb(224, 224, 224);
+         padding: 16px 32px 12px 32px;
+      }
+      .btn:active,
+      .btn:focus {
+         outline: none;
+      }
+      .btn-active {
+         color: white;
+         text-shadow: 0 0 1px rgba(0, 0, 0, 0.356);
+         background-color: #f2cb04;
+      }
+   }
    .form {
       .input {
          width: 100%;
@@ -41,22 +61,5 @@
    }
    .form-hidden {
       display: none;
-   }
-
-   .Article {
-      width: 100%;
-      overflow: hidden;
-      font-size: 16px;
-
-      img {
-         max-width: 80%;
-         max-height: 300px;
-         display: block;
-         margin: 0 auto;
-      }
-      a {
-         color: #f2cb04;
-         text-shadow: 0 0 1px rgba(0, 0, 0, 0.37);
-      }
    }
 }

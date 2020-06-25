@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import Routes from '@config/routes';
+
 import classNames from 'classnames';
 
 import Article from '@components/Article';
@@ -17,14 +21,26 @@ type EditorArticleProps = {
 };
 
 const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
+   // const dispatch = useDispatch();
+   const { auth, viewedUserOpenInfo } = useSelector((state: any) => state.firebase);
+   const [login, setLogin] = useState('');
    const [editorState, setEditorState] = useState<any>(EditorState.createEmpty());
    const [resultArticle, setResultArticle] = useState<any>('');
    const [showResult, setShowResult] = useState(false);
+   const [header, setHeader] = useState('');
+   const [photoUrl, setPhotoUrl] = useState('');
 
    // При изменении текста в редакторе происходит преобразование текста в HTML код и выводится результат
    useEffect(() => {
       setResultArticle(convertToRaw(editorState.getCurrentContent()));
    }, [editorState]);
+   useEffect(() => {
+      (async () => {
+         const idTokenResult = await auth.currentUser.getIdTokenResult();
+         setLogin(idTokenResult.claims.login);
+      })();
+      // eslint-disable-next-line
+   }, []);
 
    // Преобразование добавленой картинки в Base64
    const getFileBase64 = (file: any, callback: any) => {
@@ -50,9 +66,17 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
 
    return (
       <div className={classNames(styles['editor-container'], className)}>
-         <div>
-            <button onClick={() => setShowResult(false)}>Редактор</button>
-            <button onClick={() => setShowResult(true)}>Результат</button>
+         <div className={styles['switch-btns']}>
+            <button
+               onClick={() => setShowResult(false)}
+               className={classNames(styles['btn'], !showResult ? styles['btn-active'] : null)}>
+               Редактор
+            </button>
+            <button
+               onClick={() => setShowResult(true)}
+               className={classNames(styles['btn'], showResult ? styles['btn-active'] : null)}>
+               Результат
+            </button>
          </div>
          <form
             onSubmit={sendArticle}
@@ -62,6 +86,10 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
                className={styles['input']}
                required
                placeholder={'Название статьи'}
+               value={header}
+               onChange={(e) => {
+                  if (e.target.value.length <= 120) setHeader(e.target.value);
+               }}
             />
             <input type="text" className={styles['input']} required placeholder={'Аннотация'} />
             <Editor
@@ -127,8 +155,19 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
             />
          </form>
          {showResult ? (
-            <div style={{ width: '75%', border: '1px solid black' }}>
-               <Article content={resultArticle} />
+            <div style={{ width: '75%' }}>
+               <Article
+                  content={resultArticle}
+                  header={header}
+                  date={new Date()}
+                  author={viewedUserOpenInfo.name + ' ' + viewedUserOpenInfo.surname}
+                  authorLink={Routes.userPage.replace(':login', login)}
+                  likes={0}
+                  dislikes={0}
+                  commentsCount={0}
+                  viewsCount={0}
+                  photoUrl={photoUrl}
+               />
             </div>
          ) : null}
       </div>
