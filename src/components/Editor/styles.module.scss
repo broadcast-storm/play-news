@@ -28,6 +28,56 @@
          padding: 8px 5px;
          outline-color: #182126;
          margin: 10px 0;
+         resize: none;
+      }
+      .article-type {
+         width: 300px;
+         cursor: pointer;
+      }
+      .article-type:focus,
+      .article-type:active {
+         outline: none;
+      }
+      .get-header-url {
+         display: inline-block;
+         margin-top: -5px;
+         font-size: 14px;
+         cursor: pointer;
+         background-color: #f2cb04;
+         color: white;
+         padding: 3px 5px;
+      }
+      .url {
+         display: flex;
+         justify-content: flex-start;
+         align-items: center;
+         .url-static {
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 5px;
+         }
+         .input-url {
+            width: 300px;
+         }
+      }
+      .mainPhotoInput {
+         position: relative;
+         &__label {
+            position: absolute;
+            background-color: #f2cb04;
+            color: white;
+            cursor: pointer;
+            padding: 8px 4px;
+         }
+         &__input {
+            margin-top: 5px;
+            border: none;
+            background-color: white;
+         }
+         &__input:active,
+         &__input:focus {
+            outline: none;
+         }
       }
       .editor-toolbar {
          position: absolute;
@@ -58,8 +108,45 @@
          position: relative;
          z-index: 3;
       }
+
+      .main-buttons {
+         display: flex;
+         justify-content: space-around;
+         align-items: center;
+         box-sizing: border-box;
+         .btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+         }
+         .reject {
+            color: gray;
+            background-color: white;
+            border: 1px solid gray;
+         }
+         .save {
+            margin: 0 10px;
+            color: #f2cb04;
+            background-color: white;
+            border: 1px solid #f2cb04;
+         }
+         .submit {
+            color: white;
+            background-color: #f2cb04;
+            border: 1px solid #f2cb04;
+         }
+      }
    }
    .form-hidden {
       display: none;
+   }
+
+   .result {
+      width: 75%;
+      margin-top: 20px;
+
+      .result-category {
+         border-bottom: 3px solid black;
+      }
    }
 }

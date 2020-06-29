@@ -4,7 +4,7 @@ import SideList from '@components/SideList';
 import NewsSlider from '@components/NewsSlider';
 import styles from './style.module.scss';
 
-import { NewsForSliderArray } from '../../mocks/index';
+import { NewsArray } from '../../mocks/index';
 
 const Main: React.FC = () => {
    return (
@@ -17,7 +17,7 @@ const Main: React.FC = () => {
                <SideList />
             </div>
          </div>
-         <NewsSlider NewsArray={NewsForSliderArray} header={'Популярное'} />
+         <NewsSlider NewsArray={NewsArray} header={'Популярное'} />
       </>
    );
 };

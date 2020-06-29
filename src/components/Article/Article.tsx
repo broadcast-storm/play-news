@@ -26,6 +26,18 @@ import LikesDislikes from '@img/article/likedislike.svg';
 
 import styles from './styles.module.scss';
 
+type TagsArray =
+   | 'xbox'
+   | 'pc'
+   | 'ps4'
+   | 'shooter'
+   | 'strategy'
+   | 'rpg'
+   | 'racing'
+   | 'e3'
+   | 'exclusive'
+   | 'simulator';
+
 type ArticleProps = {
    className?: string | null;
    content: any;
@@ -40,6 +52,8 @@ type ArticleProps = {
    commentsCount: number;
    viewsCount: number;
    photoUrl: any;
+   type: string;
+   tags: Array<TagsArray>;
 };
 
 const Article: React.FC<ArticleProps> = ({
@@ -55,8 +69,22 @@ const Article: React.FC<ArticleProps> = ({
    dislikes,
    commentsCount,
    viewsCount,
-   photoUrl
+   photoUrl,
+   tags
 }) => {
+   const TagsObj = {
+      pc: 'PC',
+      xbox: 'Xbox',
+      ps4: 'PS4',
+      shooter: 'Шутеры',
+      strategy: 'Стратегии',
+      rpg: 'RPG',
+      racing: 'Гонки',
+      e3: 'E3',
+      exclusive: 'Эксклюзивы',
+      simulator: 'Симуляторы'
+   };
+
    useEffect(() => {
       if (content !== null) {
          const result = document.getElementById('articleResult');
@@ -158,7 +186,7 @@ const Article: React.FC<ArticleProps> = ({
             </div>
          </div>
          <div className={styles['mainPhoto']}>
-            {photoUrl === '' ? (
+            {photoUrl === 'File Not Found' ? (
                <div className={styles['emptyPhoto']}>
                   <span>Нет главного фото</span>
                </div>
@@ -167,7 +195,17 @@ const Article: React.FC<ArticleProps> = ({
             )}
          </div>
          <div id="articleResult" className={styles['content']}></div>
-         <div>
+         <div className={styles['share-favourite']}>
+            <div className={styles['tags']}>
+               {tags.length === 0
+                  ? 'Нет тегов'
+                  : tags.map((tag, index) => (
+                       <span key={'tag' + index} className={styles['tag']}>
+                          {/* @ts-ignore */}
+                          {TagsObj[tag]}
+                       </span>
+                    ))}
+            </div>
             <div className={styles['share']}>
                <span className={styles['share-text']}>Поделиться: </span>
                <FacebookShareButton
@@ -198,6 +236,13 @@ const Article: React.FC<ArticleProps> = ({
                   className={styles['share-icon']}>
                   <VKIcon size={25} />
                </VKShareButton>
+            </div>
+         </div>
+         <div>
+            <span>А вам понравилась статья? </span>
+            <div>
+               <span>Да!</span>
+               <img src="" alt="" />
             </div>
          </div>
       </div>

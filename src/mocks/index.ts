@@ -8,130 +8,83 @@ export const NewsArray = [
       imgUrl: photoUrl,
       header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
       descrip: 'Сейчас они попадают в матчи против команд из 5 человек.',
-      date: '24.02.2020',
+      date: new Date(),
       author: 'Георгий Киракосян',
       author_id: 'w21ed12e221',
-      type: 'Игровые новости',
-      views: 21112
+      type: 'news',
+      views: 21112,
+      comments: 0,
+      likes: 0,
+      dislikes: 0
    },
    {
       id: 'ascascas21d2',
       imgUrl: photoUrl2,
       header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
       descrip: 'Сейчас они попадают в матчи против команд из 5 человек.',
-      date: '24.02.2020',
+      date: new Date(),
       author: 'Георгий Киракосян',
       author_id: 'w21ed12e221',
-      type: 'Игровые новости',
-      views: 21112
+      type: 'news',
+      views: 21112,
+      comments: 0,
+      likes: 0,
+      dislikes: 0
    },
    {
       id: 'ascjascas21d2',
       imgUrl: photoUrl2,
       header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
       descrip: 'Сейчас они попадают в матчи против команд из 5 человек.',
-      date: '24.02.2020',
+      date: new Date(),
       author: 'Георгий Киракосян',
       author_id: 'w21ed12e221',
-      type: 'Игровые новости',
-      views: 21112
+      type: 'news',
+      views: 21112,
+      comments: 0,
+      likes: 0,
+      dislikes: 0
    },
    {
       id: 'ascascvnvas21d2',
       imgUrl: photoUrl2,
       header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
       descrip: 'Сейчас они попадают в матчи против команд из 5 человек.',
-      date: '24.02.2020',
+      date: new Date(),
       author: 'Георгий Киракосян',
       author_id: 'w21ed12e221',
-      type: 'Игровые новости',
-      views: 21112
+      type: 'news',
+      views: 21112,
+      comments: 0,
+      likes: 0,
+      dislikes: 0
    },
    {
       id: 'ascashgngfcas21d2',
       imgUrl: photoUrl2,
       header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
       descrip: 'Сейчас они попадают в матчи против команд из 5 человек.',
-      date: '24.02.2020',
+      date: new Date(),
       author: 'Георгий Киракосян',
       author_id: 'w21ed12e221',
-      type: 'Игровые новости',
-      views: 21112
+      type: 'news',
+      views: 21112,
+      comments: 0,
+      likes: 0,
+      dislikes: 0
    },
    {
       id: 'ascascasadfas21d2',
       imgUrl: photoUrl2,
       header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
       descrip: 'Сейчас они попадают в матчи против команд из 5 человек.',
-      date: '24.02.2020',
+      date: new Date(),
       author: 'Георгий Киракосян',
       author_id: 'w21ed12e221',
-      type: 'Игровые новости',
-      views: 21112
-   }
-];
-
-export const NewsForSliderArray = [
-   {
-      id: 'ascascas21d1',
-      imgUrl: photoUrl,
-      header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
-      date: '24.02.2020',
-      comments: 2345,
-      views: 612
-   },
-
-   {
-      id: 'ascascafsgs21d1',
-      imgUrl: photoUrl2,
-      header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
-      date: '24.02.2020',
-      comments: 2345,
-      views: 612
-   },
-
-   {
-      id: 'ascascasdgfs21d1',
-      imgUrl: photoUrl,
-      header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
-      date: '24.02.2020',
-      comments: 2345,
-      views: 612
-   },
-
-   {
-      id: 'ascasdfghjcas21d1',
-      imgUrl: photoUrl2,
-      header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
-      date: '24.02.2020',
-      comments: 2345,
-      views: 612
-   },
-
-   {
-      id: 'ascassdgfcas21d1',
-      imgUrl: photoUrl,
-      header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
-      date: '24.02.2020',
-      comments: 2345,
-      views: 612
-   },
-
-   {
-      id: 'ascassfghcas21d1',
-      imgUrl: photoUrl2,
-      header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
-      date: '24.02.2020',
-      comments: 2345,
-      views: 612
-   },
-
-   {
-      id: 'ascascghjas21d1',
-      imgUrl: photoUrl,
-      header: 'Авторы Rainbow Six Siege обсуждают отдельный матчмейкинг для соло-игроков',
-      date: '24.02.2020',
-      comments: 2345,
-      views: 612
+      type: 'news',
+      views: 21112,
+      comments: 0,
+      likes: 0,
+      dislikes: 0
    }
 ];
