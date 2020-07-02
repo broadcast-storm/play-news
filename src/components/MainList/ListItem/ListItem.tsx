@@ -54,15 +54,7 @@ const ListItem: React.FC<ListItemProps> = ({ className, news }) => {
          <div className={styles['news-item__text']}>
             <h2 className={styles['text__header']}>
                <NavLink
-                  to={
-                     news.type === 'articles'
-                        ? Routes.mainText.article.replace(':id', news.id)
-                        : news.type === 'reviews'
-                        ? Routes.mainText.review.replace(':id', news.id)
-                        : news.type === 'news'
-                        ? Routes.mainText.news.replace(':id', news.id)
-                        : '/'
-                  }
+                  to={Routes.mainText.article.replace(':id', news.id).replace(':type', news.type)}
                   className={styles['text__header__link']}>
                   {news.header === '' ? 'Пустое название статьи' : news.header}
                </NavLink>

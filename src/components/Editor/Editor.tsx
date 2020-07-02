@@ -14,6 +14,8 @@ import NewsSlider from '@components/NewsSlider';
 import { Editor } from 'react-draft-wysiwyg';
 import { EditorState, convertToRaw } from 'draft-js';
 
+import { publishArticle } from '@actions/firebase';
+
 // eslint-disable-next-line
 import htmlToDraft from 'html-to-draftjs';
 
@@ -99,7 +101,7 @@ const transliterate = (text: string) => {
 };
 
 const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
-   // const dispatch = useDispatch();
+   const dispatch = useDispatch();
    const mainPhotoInput = useRef(null);
    const { auth, viewedUserOpenInfo } = useSelector((state: any) => state.firebase);
    const [login, setLogin] = useState('');
@@ -119,6 +121,20 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
    useEffect(() => {
       setResultArticle(convertToRaw(editorState.getCurrentContent()));
    }, [editorState]);
+
+   useEffect(() => {
+      setResultUrl(
+         articleUrl +
+            '--' +
+            ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][
+               new Date().getMonth()
+            ] +
+            '-' +
+            (new Date().getDate() < 10 ? '0' + new Date().getDate() : new Date().getDate()) +
+            '-' +
+            new Date().getFullYear()
+      );
+   }, [articleUrl]);
 
    useEffect(() => {
       (async () => {
@@ -153,23 +169,54 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
    //Отправить написанную статью (редактору, если обычный пользователь и сразу на сайт, если редактор)
    const sendArticle = (e: any) => {
       e.preventDefault();
+      let mainPhoto: any = null;
+      let smallPhoto: any = null;
+
+      Resizer.imageFileResizer(
+         // @ts-ignore
+         mainPhotoInput.current.files[0],
+         1600,
+         900,
+         'JPEG',
+         70,
+         0,
+         (blobMain) => {
+            mainPhoto = blobMain;
+            Resizer.imageFileResizer(
+               // @ts-ignore
+               mainPhotoInput.current.files[0],
+               320,
+               180,
+               'JPEG',
+               100,
+               0,
+               (blobSmall) => {
+                  smallPhoto = blobSmall;
+                  dispatch(
+                     publishArticle(
+                        resultArticle,
+                        header,
+                        annotation,
+                        mainPhoto,
+                        smallPhoto,
+                        articleType,
+                        tags,
+                        resultUrl,
+                        viewedUserOpenInfo.name + ' ' + viewedUserOpenInfo.surname,
+                        login
+                     )
+                  );
+               },
+               'blob'
+            );
+         },
+         'blob'
+      );
    };
 
    const makeResult = async () => {
-      setShowResult(true);
-      setResultUrl(
-         articleUrl +
-            '--' +
-            ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][
-               new Date().getMonth()
-            ] +
-            '-' +
-            (new Date().getDate() < 10 ? '0' + new Date().getDate() : new Date().getDate()) +
-            '-' +
-            new Date().getFullYear()
-      );
       // @ts-ignore
-      if (mainPhotoInput.current.files[0] !== null) {
+      if (mainPhotoInput !== null && mainPhotoInput.current.files[0] !== null) {
          Resizer.imageFileResizer(
             // @ts-ignore
             mainPhotoInput.current.files[0],
@@ -198,6 +245,18 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
             'base64'
          );
       }
+      setShowResult(true);
+      setResultUrl(
+         articleUrl +
+            '--' +
+            ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][
+               new Date().getMonth()
+            ] +
+            '-' +
+            (new Date().getDate() < 10 ? '0' + new Date().getDate() : new Date().getDate()) +
+            '-' +
+            new Date().getFullYear()
+      );
    };
 
    const rejectFunc = () => {};

@@ -243,3 +243,118 @@ exports.setInitialInfo = functions.https.onCall((data, context) => {
          return error;
       });
 });
+
+// ПУБЛИКАЦИЯ НОВОЙ СТАТЬИ
+
+exports.publishArticle = functions.https.onCall(async (data, context) => {
+   if (
+      context.auth?.uid === null ||
+      (context.auth?.token.redactor === false && context.auth?.token.admin === false)
+   ) {
+      return {
+         error: 'Publishing available only for redactors or admins'
+      };
+   }
+   const article = admin
+      .firestore()
+      .collection('articles')
+      .doc(data.descrip.id);
+
+   const articleContent = admin
+      .firestore()
+      .collection('articlesContent')
+      .doc(data.descrip.id);
+
+   const articleComments = admin
+      .firestore()
+      .collection('comments')
+      .doc(data.descrip.id);
+
+   return articleComments
+      .set({
+         comments: []
+      })
+      .then(async () => {
+         try {
+            await article.set({
+               ...data.descrip,
+               date: new Date(),
+               lastEdited: new Date(),
+               likes: 0,
+               dislikes: 0,
+               commentsCount: 0,
+               viewsCount: 0,
+               isShowing: true,
+               isShowingComments: true,
+               isEditing: false,
+               isBlockedComments: false,
+               redactor: context.auth?.token.login
+            });
+            try {
+               await articleContent.set({
+                  content: data.content
+               });
+               return { message: 'Publishing done' };
+            } catch (error) {
+               return error;
+            }
+         } catch (error_1) {
+            return error_1;
+         }
+      });
+});
+
+// ПОЛУЧИТЬ СТАТЬЮ (ОБЫЧНЫЙ ПОЛЬЗОВАТЕЛЬ)
+
+exports.getArticle = functions.https.onCall(async (data) => {
+   if (data.type !== 'article' && data.type !== 'review' && data.type !== 'news') {
+      return {
+         error: 'Wrong type'
+      };
+   }
+
+   const description = admin
+      .firestore()
+      .collection('articles')
+      .doc(data.id);
+
+   const content = admin
+      .firestore()
+      .collection('articlesContent')
+      .doc(data.id);
+
+   const comments = admin
+      .firestore()
+      .collection('comments')
+      .doc(data.id);
+
+   return description.get().then(async (doc) => {
+      try {
+         if (doc.exists) {
+            const descriptionArticle = doc.data();
+            if (descriptionArticle!.isShowing) {
+               const contentArticle = (await content.get()).data();
+               const commentsArticle = (await comments.get()).data();
+               return {
+                  message: 'well done',
+                  result: {
+                     description: descriptionArticle,
+                     content: contentArticle,
+                     comments: commentsArticle
+                  }
+               };
+            } else
+               return {
+                  message: 'no article',
+                  result: null
+               };
+         } else
+            return {
+               message: 'no article',
+               result: null
+            };
+      } catch (error_1) {
+         return error_1;
+      }
+   });
+});

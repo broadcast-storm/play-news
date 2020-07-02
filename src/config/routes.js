@@ -6,9 +6,7 @@ export default {
       reviews: '/reviews'
    },
    mainText: {
-      news: '/news/:id',
-      article: '/articles/:id',
-      review: '/reviews/:id'
+      article: '/:type/:id'
    },
    infoPage: '/info',
    loginPage: '/auth',

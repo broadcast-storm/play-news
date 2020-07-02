@@ -1,6 +1,8 @@
-import { combineReducers } from "redux";
-import { firebaseReducer } from "./firebaseReducer";
+import { combineReducers } from 'redux';
+import { firebaseReducer } from './firebaseReducer';
+import { showedArticleReducer } from './showedArticleReducer';
 
 export const rootReducer = combineReducers({
-  firebase: firebaseReducer
+   firebase: firebaseReducer,
+   showedArticle: showedArticleReducer
 });

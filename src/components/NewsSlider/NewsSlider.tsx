@@ -90,15 +90,9 @@ const NewsSlider: React.FC<Props> = ({ className, NewsArray, header, isTest }) =
                <NavLink
                   key={newsItem.id}
                   className={styles['item']}
-                  to={
-                     newsItem.type === 'articles'
-                        ? Routes.mainText.article.replace(':id', newsItem.id)
-                        : newsItem.type === 'reviews'
-                        ? Routes.mainText.review.replace(':id', newsItem.id)
-                        : newsItem.type === 'news'
-                        ? Routes.mainText.news.replace(':id', newsItem.id)
-                        : '/'
-                  }>
+                  to={Routes.mainText.article
+                     .replace(':id', newsItem.id)
+                     .replace(':type', newsItem.type)}>
                   <div className={styles['photo-container']}>
                      {newsItem.imgUrl === 'File Not Found' || newsItem.imgUrl === '' ? (
                         <div className={styles['emptyPhoto']}>

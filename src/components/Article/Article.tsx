@@ -97,15 +97,18 @@ const Article: React.FC<ArticleProps> = ({
    }, []);
 
    function formatDate(date: any) {
-      var dd = date.getDate();
+      let _date: any;
+      if (!(date instanceof Date)) {
+         _date = new Date(date._seconds * 1000);
+      } else _date = date;
+      var dd = _date.getDate();
       if (dd < 10) dd = '0' + dd;
 
-      var mm = date.getMonth() + 1;
+      var mm = _date.getMonth() + 1;
       if (mm < 10) mm = '0' + mm;
 
-      return dd + '.' + mm + '.' + date.getFullYear();
+      return dd + '.' + mm + '.' + _date.getFullYear();
    }
-
    return (
       <div className={styles['article-container']}>
          <h1 className={styles['header']}>{header === '' ? 'Пустое название статьи' : header}</h1>

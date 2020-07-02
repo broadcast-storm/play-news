@@ -18,6 +18,9 @@ const CLEAR_VIEWED_USER_INFO = 'CLEAR_VIEWED_USER_INFO';
 const UPDATE_USER_INFO_BEGIN = 'UPDATE_USER_INFO_BEGIN';
 const USER_INFO_UPDATED = 'USER_INFO_UPDATED';
 
+const START_PUBLISHING = 'START_PUBLISHING';
+const SUCCESS_FINISH_PUBLISHING = 'SUCCESS_FINISH_PUBLISHING';
+
 // ИНИЦИАЛИЗАЦИЯ FIREBASE
 export function firebaseInit() {
    return async (dispatch, getState) => {
@@ -448,6 +451,71 @@ export function uploadUserPhoto(imageBlob) {
                });
             }, 5000);
          });
+      });
+   };
+}
+
+export function publishArticle(
+   articleContent,
+   header,
+   annotation,
+   mainPhoto,
+   smallPhoto,
+   articleType,
+   tags,
+   url,
+   author,
+   authorLink
+) {
+   return (dispatch, getState) => {
+      const { firebase } = getState();
+      dispatch({ type: START_PUBLISHING });
+      firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
+         if (idTokenResult.claims.redactor === true || idTokenResult.claims.admin === true) {
+            var mainPhotoRef = firebase.storageRef.child(`articles/${url}/${url}.jpg`);
+            var smallPhotoRef = firebase.storageRef.child(`articles/${url}/${url}_small.jpg`);
+            mainPhotoRef.put(mainPhoto).then(async function(snapshot) {
+               smallPhotoRef.put(smallPhoto).then(async function(snapshot) {
+                  const mainPhotoUrl = await firebase.storageRef
+                     .child(`articles/${url}/${url}.jpg`)
+                     .getDownloadURL();
+                  const smallPhotoUrl = await firebase.storageRef
+                     .child(`articles/${url}/${url}_small.jpg`)
+                     .getDownloadURL();
+
+                  const publishArticle = firebase.functions.httpsCallable('publishArticle');
+
+                  const result = await publishArticle({
+                     descrip: {
+                        id: url,
+                        header: header,
+                        author: author,
+                        authorLink: authorLink,
+                        articleType: articleType,
+                        mainPhotoUrl: mainPhotoUrl,
+                        smallPhotoUrl: smallPhotoUrl,
+                        tags: tags,
+                        annotation: annotation
+                     },
+                     content: articleContent
+                  });
+
+                  console.log(result);
+
+                  dispatch({ type: SUCCESS_FINISH_PUBLISHING });
+
+                  // const contentResult = await firebase.db
+                  //    .collection('articlesContent')
+                  //    .doc(url)
+                  //    .set({
+                  //       content: articleContent,
+                  //       redactor: redactorLogin
+                  //    });
+
+                  // console.log(contentResult);
+               });
+            });
+         }
       });
    };
 }

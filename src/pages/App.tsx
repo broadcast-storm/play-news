@@ -5,16 +5,22 @@ import { firebaseInit, startAuthStateChangeCheck } from '@actions/firebase';
 
 import { useSelector, useDispatch } from 'react-redux';
 import Navbar from '@components/Navbar';
+import Loader from '@components/Loader';
 import Routes from '@config/routes';
 import { Route, Switch, withRouter } from 'react-router-dom';
 
+// @ts-ignore
+import loadable from '@loadable/component';
+// @ts-ignore
+import pMinDelay from 'p-min-delay';
+
 // Основные страницы сайта
-import UserPage from '@pages/UserPage';
-import AdminPage from '@pages/AdminPage';
-import Login from '@pages/Login';
-import Main from '@pages/Main';
-import ArticlePage from '@pages/ArticlePage';
-import Info from '@pages/Info';
+// import UserPage from '@pages/UserPage';
+// import AdminPage from '@pages/AdminPage';
+// import Login from '@pages/Login';
+// import Main from '@pages/Main';
+// import ArticlePage from '@pages/ArticlePage';
+// import Info from '@pages/Info';
 
 import Footer from '@components/Footer';
 
@@ -22,6 +28,18 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 import styles from './style.module.scss';
+
+const UserPage = loadable(() => pMinDelay(import('@pages/UserPage'), 500));
+
+const AdminPage = loadable(() => pMinDelay(import('@pages/AdminPage'), 500));
+
+const Login = loadable(() => pMinDelay(import('@pages/Login'), 500));
+
+const Main = loadable(() => pMinDelay(import('@pages/Main'), 500));
+
+const ArticlePage = loadable(() => pMinDelay(import('@pages/ArticlePage'), 500));
+
+const Info = loadable(() => pMinDelay(import('@pages/Info'), 500));
 
 // @ts-ignore
 const App: React.FC = ({ location }) => {
@@ -60,13 +78,13 @@ const App: React.FC = ({ location }) => {
 
          <div className={styles['container']}>
             <Switch>
-               <Route path={Routes.userPage} component={UserPage} />
-               <Route path={Routes.adminPage} component={AdminPage} />
-               <Route path={Routes.loginPage} component={Login} />
-               <Route path={Routes.infoPage} component={Info} />
+               <Route path={Routes.userPage} render={() => <UserPage fallback={<Loader />} />} />
+               <Route path={Routes.adminPage} render={() => <AdminPage fallback={<Loader />} />} />
+               <Route path={Routes.loginPage} render={() => <Login fallback={<Loader />} />} />
+               <Route path={Routes.infoPage} render={() => <Info fallback={<Loader />} />} />
                <Route
-                  path={[Routes.mainText.article, Routes.mainText.review, Routes.mainText.news]}
-                  component={ArticlePage}
+                  path={Routes.mainText.article}
+                  render={() => <ArticlePage fallback={<Loader />} />}
                />
                <Route
                   exact
@@ -75,7 +93,7 @@ const App: React.FC = ({ location }) => {
                      Routes.mainCategories.articles,
                      Routes.mainCategories.reviews
                   ]}
-                  component={Main}
+                  render={() => <Main fallback={<Loader />} />}
                />
             </Switch>
          </div>
