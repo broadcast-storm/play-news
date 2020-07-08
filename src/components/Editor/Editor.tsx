@@ -538,13 +538,14 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
                   date={new Date()}
                   author={viewedUserOpenInfo.name + ' ' + viewedUserOpenInfo.surname}
                   authorLink={Routes.userPage.replace(':login', login)}
-                  likes={0}
-                  dislikes={0}
+                  likes={[]}
+                  dislikes={[]}
                   commentsCount={0}
                   viewsCount={0}
                   photoUrl={photoUrl}
                   type={articleType}
                   tags={tags}
+                  articleId={resultUrl}
                />
             </div>
          ) : null}

@@ -15,7 +15,7 @@ import { clearViewedUserInfo, getViewedUserInfo } from '@actions/firebase';
 
 import styles from './style.module.scss';
 
-import DefaultUserImg from '@img/user/defaultPhoto.png';
+import DefaultUserImg from '@img/user/defaultPhoto.svg';
 import UploadPhotoImg from '@img/user/uploadPhoto.png';
 
 type UserProps = {

@@ -7,7 +7,7 @@ import Routes from '@config/routes';
 import { getNavbarInfo } from '@actions/firebase';
 
 import EmptyProfile from '@img/Navbar/empty-logo.svg';
-import DefaultUserImg from '@img/user/defaultPhoto.png';
+import DefaultUserImg from '@img/user/defaultPhoto.svg';
 
 import styles from '@components/Navbar/styles.module.scss';
 

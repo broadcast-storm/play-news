@@ -1,5 +1,10 @@
 import React, { useEffect } from 'react';
 
+import { useSelector, useDispatch } from 'react-redux';
+
+import { dislikeArticle, likeArticle } from '@actions/showedArticle';
+import { CircleSpinner } from 'react-spinners-kit';
+
 import { NavLink } from 'react-router-dom';
 
 import draftToHtml from 'draftjs-to-html';
@@ -7,6 +12,8 @@ import draftToHtml from 'draftjs-to-html';
 import htmlToDraft from 'html-to-draftjs';
 // @ts-ignore
 import toHtml from 'string-to-html';
+
+import classNames from 'classnames';
 
 import {
    FacebookShareButton,
@@ -23,6 +30,13 @@ import StarChecked from '@img/article/star_checked.svg';
 import Eye from '@img/article/eye.svg';
 import Comment from '@img/article/comment.svg';
 import LikesDislikes from '@img/article/likedislike.svg';
+
+import LikeSvg from '@img/likes/like.svg';
+import LikedSvg from '@img/likes/liked.svg';
+import DislikeSvg from '@img/likes/dislike.svg';
+import DislikedSvg from '@img/likes/disliked.svg';
+import LikeGraySvg from '@img/likes/like_gray.svg';
+import DislikeGraySvg from '@img/likes/dislike_gray.svg';
 
 import styles from './styles.module.scss';
 
@@ -47,13 +61,14 @@ type ArticleProps = {
    date: any;
    author: string;
    authorLink: string;
-   likes: number;
-   dislikes: number;
+   likes: Array<string>;
+   dislikes: Array<string>;
    commentsCount: number;
    viewsCount: number;
    photoUrl: any;
    type: string;
    tags: Array<TagsArray>;
+   articleId: string;
 };
 
 const Article: React.FC<ArticleProps> = ({
@@ -70,7 +85,8 @@ const Article: React.FC<ArticleProps> = ({
    commentsCount,
    viewsCount,
    photoUrl,
-   tags
+   tags,
+   articleId
 }) => {
    const TagsObj = {
       pc: 'PC',
@@ -84,6 +100,10 @@ const Article: React.FC<ArticleProps> = ({
       exclusive: 'Эксклюзивы',
       simulator: 'Симуляторы'
    };
+
+   const dispatch = useDispatch();
+   const { navbarInfo, authUser } = useSelector((state: any) => state.firebase);
+   const { isLikingArticle } = useSelector((state: any) => state.showedArticle);
 
    useEffect(() => {
       if (content !== null) {
@@ -99,7 +119,7 @@ const Article: React.FC<ArticleProps> = ({
    function formatDate(date: any) {
       let _date: any;
       if (!(date instanceof Date)) {
-         _date = new Date(date._seconds * 1000);
+         _date = new Date(date.seconds * 1000);
       } else _date = date;
       var dd = _date.getDate();
       if (dd < 10) dd = '0' + dd;
@@ -109,6 +129,16 @@ const Article: React.FC<ArticleProps> = ({
 
       return dd + '.' + mm + '.' + _date.getFullYear();
    }
+
+   const sendLike = () => {
+      if (authUser !== null && isLikingArticle === null && !isTest)
+         dispatch(likeArticle(articleId));
+   };
+
+   const sendDislike = () => {
+      if (authUser !== null && isLikingArticle === null && !isTest)
+         dispatch(dislikeArticle(articleId));
+   };
    return (
       <div className={styles['article-container']}>
          <h1 className={styles['header']}>{header === '' ? 'Пустое название статьи' : header}</h1>
@@ -144,7 +174,7 @@ const Article: React.FC<ArticleProps> = ({
                   <VKIcon size={25} />
                </VKShareButton>
             </div>
-            <div className={styles['favourite']}>
+            <div className={classNames(styles['favourite'], styles['hidden'])}>
                <div className={styles['fav-icon']}>
                   <img src={isFavourite ? StarChecked : Star} alt="" />
                </div>
@@ -169,9 +199,9 @@ const Article: React.FC<ArticleProps> = ({
                   </div>
                   <span className={styles['text']}>
                      {' '}
-                     <span className={styles['green']}>{likes}</span>
+                     <span className={styles['green']}>{likes.length}</span>
                      {' / '}
-                     <span className={styles['red']}>{dislikes}</span>
+                     <span className={styles['red']}>{dislikes.length}</span>
                   </span>
                </div>
                <div className={styles['views']}>
@@ -241,13 +271,85 @@ const Article: React.FC<ArticleProps> = ({
                </VKShareButton>
             </div>
          </div>
-         <div>
-            <span>А вам понравилась статья? </span>
-            <div>
-               <span>Да!</span>
-               <img src="" alt="" />
+         {authUser === null || isTest ? null : (
+            <div
+               className={classNames(
+                  styles['doYouLike'],
+                  navbarInfo === null
+                     ? null
+                     : dislikes.indexOf(navbarInfo.openInfo.login) !== -1
+                     ? styles['disliked']
+                     : likes.indexOf(navbarInfo.openInfo.login) !== -1
+                     ? styles['liked']
+                     : null
+               )}>
+               <span className={styles['question']}>А вам понравилась статья? </span>
+               <div
+                  className={classNames(
+                     styles['like-btn'],
+                     styles['dislike'],
+                     navbarInfo === null
+                        ? null
+                        : likes.indexOf(navbarInfo.openInfo.login) !== -1
+                        ? styles['gray']
+                        : null
+                  )}
+                  onClick={sendDislike}>
+                  <span>Нет</span>
+                  <div className={styles['pict']}>
+                     <img
+                        src={
+                           navbarInfo === null
+                              ? DislikeSvg
+                              : dislikes.indexOf(navbarInfo.openInfo.login) !== -1
+                              ? DislikedSvg
+                              : likes.indexOf(navbarInfo.openInfo.login) !== -1
+                              ? DislikeGraySvg
+                              : DislikeSvg
+                        }
+                        alt=""
+                     />
+                  </div>
+                  {isLikingArticle === 'dislike' ? (
+                     <div className={styles['like-loader']}>
+                        <CircleSpinner size={16} color={'#C90E0E'} />
+                     </div>
+                  ) : null}
+               </div>
+               <div
+                  className={classNames(
+                     styles['like-btn'],
+                     styles['like'],
+                     navbarInfo === null
+                        ? null
+                        : dislikes.indexOf(navbarInfo.openInfo.login) !== -1
+                        ? styles['gray']
+                        : null
+                  )}
+                  onClick={sendLike}>
+                  <span>Да</span>
+                  <div className={styles['pict']}>
+                     <img
+                        src={
+                           navbarInfo === null
+                              ? LikeSvg
+                              : likes.indexOf(navbarInfo.openInfo.login) !== -1
+                              ? LikedSvg
+                              : dislikes.indexOf(navbarInfo.openInfo.login) !== -1
+                              ? LikeGraySvg
+                              : LikeSvg
+                        }
+                        alt=""
+                     />
+                  </div>
+                  {isLikingArticle === 'like' ? (
+                     <div className={styles['like-loader']}>
+                        <CircleSpinner size={16} color={'#3FC90E'} />
+                     </div>
+                  ) : null}
+               </div>
             </div>
-         </div>
+         )}
       </div>
    );
 };

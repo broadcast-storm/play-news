@@ -38,6 +38,10 @@ const SideList: React.FC<MainNewsListProps> = ({ className }) => {
                статьи
             </button>
          </div>
+
+         <div className={styles['in-develop']}>
+            <span>В разработке</span>
+         </div>
       </div>
    );
 };

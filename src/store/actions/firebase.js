@@ -28,7 +28,7 @@ export function firebaseInit() {
       app.initializeApp(firebase.firebaseConfig);
       const auth = app.auth();
       const db = app.firestore();
-      const functions = app.functions();
+      const functions = FIREBASE.app().functions('europe-west3');
       const storage = app.storage();
       const storageRef = storage.ref();
       const usersPhotoRef = storageRef.child('usersPhoto');

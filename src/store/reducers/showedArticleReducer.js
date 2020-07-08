@@ -1,10 +1,12 @@
 const initialState = {
    isLoading: true,
-   isLoadingComments: true,
-   description: null,
    content: null,
-   comments: null,
-   error: false
+   commentIsSending: false,
+   error: false,
+   errorComments: false,
+   isLikingComment: null,
+   isLikingArticle: null,
+   isDeletingComment: null
 };
 
 export const showedArticleReducer = (state = initialState, action) => {
@@ -25,11 +27,58 @@ export const showedArticleReducer = (state = initialState, action) => {
             ...state,
             isLoading: false,
             error: false,
-            description: action.payload.description,
-            content: action.payload.content,
-            comments: action.payload.comments
+            content: action.payload.content
          };
 
+      case 'SEND_COMMENT_BEGIN':
+         return {
+            ...state,
+            errorComments: false,
+            commentIsSending: true
+         };
+
+      case 'SEND_COMMENT_FAILED':
+         return {
+            ...state,
+            errorComments: true,
+            commentIsSending: false
+         };
+      case 'SEND_COMMENT_SUCCESS':
+         return {
+            ...state,
+            commentIsSending: false
+         };
+      case 'SEND_LIKE':
+         return {
+            ...state,
+            isLikingComment: { ...action.payload }
+         };
+      case 'SEND_LIKE_DONE':
+         return {
+            ...state,
+            isLikingComment: null
+         };
+
+      case 'DELETE_COMMENT':
+         return {
+            ...state,
+            isDeletingComment: action.payload
+         };
+      case 'DELETE_COMMENT_DONE':
+         return {
+            ...state,
+            isDeletingComment: null
+         };
+      case 'SEND_LIKE_ARTICLE':
+         return {
+            ...state,
+            isLikingArticle: action.payload
+         };
+      case 'SEND_LIKE_ARTICLE_DONE':
+         return {
+            ...state,
+            isLikingArticle: null
+         };
       default:
          return state;
    }

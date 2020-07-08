@@ -1,12 +1,12 @@
 import React from 'react';
 import Routes from '@config/routes';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { CircleSpinner } from 'react-spinners-kit';
 
-import Vk from '@img/login/vk.png';
-import Facebook from '@img/login/facebook.png';
-import Twitter from '@img/login/twitter.png';
-import Tel from '@img/login/telegram.png';
+// import Vk from '@img/login/vk.png';
+// import Facebook from '@img/login/facebook.png';
+// import Twitter from '@img/login/twitter.png';
+// import Tel from '@img/login/telegram.png';
 
 import styles from '../style.module.scss';
 
@@ -143,8 +143,8 @@ class Registration extends React.Component<
                </button>
             </form>
 
-            <span>Войти через социальные сети</span>
-            <div className={styles['social']}>
+            {/* <span>Войти через социальные сети</span> */}
+            {/* <div className={styles['social']}>
                <Link to={'/'} className={styles['social__item']}>
                   <img src={Vk} alt="Vk" />
                </Link>
@@ -157,7 +157,7 @@ class Registration extends React.Component<
                <Link to={'/'} className={styles['social__item']}>
                   <img src={Tel} alt="Telegram" />
                </Link>
-            </div>
+            </div> */}
             <div className={styles['links']}>
                <NavLink to={Routes.loginPage} className={styles['links__item']}>
                   Войти в аккаунт

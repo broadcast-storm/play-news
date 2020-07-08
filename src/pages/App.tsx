@@ -29,17 +29,17 @@ import 'slick-carousel/slick/slick-theme.css';
 
 import styles from './style.module.scss';
 
-const UserPage = loadable(() => pMinDelay(import('@pages/UserPage'), 500));
+const UserPage = loadable(() => pMinDelay(import('@pages/UserPage'), 100));
 
-const AdminPage = loadable(() => pMinDelay(import('@pages/AdminPage'), 500));
+const AdminPage = loadable(() => pMinDelay(import('@pages/AdminPage'), 100));
 
-const Login = loadable(() => pMinDelay(import('@pages/Login'), 500));
+const Login = loadable(() => pMinDelay(import('@pages/Login'), 100));
 
-const Main = loadable(() => pMinDelay(import('@pages/Main'), 500));
+const Main = loadable(() => pMinDelay(import('@pages/Main'), 100));
 
-const ArticlePage = loadable(() => pMinDelay(import('@pages/ArticlePage'), 500));
+const ArticlePage = loadable(() => pMinDelay(import('@pages/ArticlePage'), 100));
 
-const Info = loadable(() => pMinDelay(import('@pages/Info'), 500));
+const Info = loadable(() => pMinDelay(import('@pages/Info'), 100));
 
 // @ts-ignore
 const App: React.FC = ({ location }) => {
@@ -80,7 +80,7 @@ const App: React.FC = ({ location }) => {
             <Switch>
                <Route path={Routes.userPage} render={() => <UserPage fallback={<Loader />} />} />
                <Route path={Routes.adminPage} render={() => <AdminPage fallback={<Loader />} />} />
-               <Route path={Routes.loginPage} render={() => <Login fallback={<Loader />} />} />
+               <Route path={Routes.loginPage} render={() => <Login fallback={null} />} />
                <Route path={Routes.infoPage} render={() => <Info fallback={<Loader />} />} />
                <Route
                   path={Routes.mainText.article}

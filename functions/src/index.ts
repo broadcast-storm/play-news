@@ -4,6 +4,7 @@ import * as admin from 'firebase-admin';
 import { tmpdir } from 'os';
 import { join, dirname } from 'path';
 
+// import algoliasearch from 'algoliasearch';
 import * as sharp from 'sharp';
 import * as fs from 'fs-extra';
 
@@ -11,55 +12,79 @@ import * as fs from 'fs-extra';
 
 admin.initializeApp();
 
+// const env = functions.config();
+
+// const client = algoliasearch(env.algolia.app_id, env.algolia.api_key);
+// const indexArticles = client.initIndex('Articles');
+
 const gcs = admin.storage();
 
+// exports.onArticleCreated = functions
+//    .region('europe-west3')
+//    .firestore.document('articles/{articleId}')
+//    .onCreate((snap, context) => {
+//       const article = snap.data();
+//       article.objectID = context.params.articleId;
+//       return indexArticles.saveObject(article);
+//    });
+
+// exports.onArticleDeleted = functions
+//    .region('europe-west3')
+//    .firestore.document('articles/{articleId}')
+//    .onDelete((snap, context) => {
+//       return indexArticles.deleteObject(context.params.articleId);
+//    });
+
 // СОЗДАНИЕ ОПТИМИЗИРОВАННЫХ ФОТОГРАФИЙ ПРИ СМЕНЕ ФОТО ПРОФИЛЯ
-exports.generateThumbs = functions.storage.object().onFinalize(async (object, context) => {
-   const bucket = gcs.bucket(object.bucket);
-   const filePath = object.name;
-   if (filePath?.includes('usersPhoto')) {
-      const contentType = object.contentType;
-      const fileName = filePath.split('/').pop();
-      const bucketDir = dirname(filePath);
-      const workingDir = join(tmpdir(), 'thumbs');
-      const tmpFilePath = join(workingDir, context.eventId);
-      const metadata = {
-         contentType: contentType
-      };
+exports.generateThumbs = functions
+   .region('europe-west3')
+   .storage.object()
+   .onFinalize(async (object, context) => {
+      const bucket = gcs.bucket(object.bucket);
+      const filePath = object.name;
+      if (filePath?.includes('usersPhoto')) {
+         const contentType = object.contentType;
+         const fileName = filePath.split('/').pop();
+         const bucketDir = dirname(filePath);
+         const workingDir = join(tmpdir(), 'thumbs');
+         const tmpFilePath = join(workingDir, context.eventId);
+         const metadata = {
+            contentType: contentType
+         };
 
-      if (fileName?.includes('thumb@') || !object.contentType?.includes('image')) {
-         console.log('resize func close');
-         return false;
-      }
+         if (fileName?.includes('thumb@') || !object.contentType?.includes('image')) {
+            console.log('resize func close');
+            return false;
+         }
 
-      await fs.ensureDir(workingDir);
-      await bucket.file(filePath).download({
-         destination: tmpFilePath
-      });
-      const sizes = [64, 128, 200];
-
-      const uploadPromises = sizes.map(async (size) => {
-         const thumbName = `thumb@${size}_${fileName}`;
-         const thumbPath = join(workingDir, thumbName);
-
-         await sharp(tmpFilePath)
-            .resize(size, size)
-            .toFile(thumbPath);
-
-         return bucket.upload(thumbPath, {
-            destination: join(bucketDir, thumbName),
-            metadata: metadata
+         await fs.ensureDir(workingDir);
+         await bucket.file(filePath).download({
+            destination: tmpFilePath
          });
-      });
+         const sizes = [64, 128, 200];
 
-      await Promise.all(uploadPromises);
+         const uploadPromises = sizes.map(async (size) => {
+            const thumbName = `thumb@${size}_${fileName}`;
+            const thumbPath = join(workingDir, thumbName);
 
-      const file = bucket.file(filePath);
+            await sharp(tmpFilePath)
+               .resize(size, size)
+               .toFile(thumbPath);
 
-      await file.delete();
-      return fs.remove(workingDir);
-   } else return false;
-});
+            return bucket.upload(thumbPath, {
+               destination: join(bucketDir, thumbName),
+               metadata: metadata
+            });
+         });
+
+         await Promise.all(uploadPromises);
+
+         const file = bucket.file(filePath);
+
+         await file.delete();
+         return fs.remove(workingDir);
+      } else return false;
+   });
 
 // НАЗНАЧЕНИЕ АДМИНИСТРАТОРА
 async function grantAdminRole(email: string): Promise<void> {
@@ -75,7 +100,7 @@ async function grantAdminRole(email: string): Promise<void> {
    });
 }
 
-exports.addAdmin = functions.https.onCall((data, context) => {
+exports.addAdmin = functions.region('europe-west3').https.onCall((data, context) => {
    if (context.auth?.token.admin !== true) {
       return {
          error: 'User must be admin to creat new admin!'
@@ -104,7 +129,7 @@ async function getAdminStatusFunc(email: string): Promise<void> {
    });
 }
 
-exports.getAdminStatus = functions.https.onCall((data, context) => {
+exports.getAdminStatus = functions.region('europe-west3').https.onCall((data, context) => {
    if (context.auth?.token.admin !== true) {
       return {
          error: 'User must be admin to creat new admin!'
@@ -132,7 +157,7 @@ async function clearAdminStatusFunc(email: string): Promise<void> {
    });
 }
 
-exports.clearAdminStatus = functions.https.onCall((data, context) => {
+exports.clearAdminStatus = functions.region('europe-west3').https.onCall((data, context) => {
    if (context.auth?.token.admin !== true) {
       return {
          error: 'User must be admin to creat new admin!'
@@ -159,7 +184,7 @@ async function saveNewLogin(email: string, login: string): Promise<void> {
    });
 }
 
-exports.saveLogin = functions.https.onCall((data, context) => {
+exports.saveLogin = functions.region('europe-west3').https.onCall((data, context) => {
    if (context.auth?.uid === null) {
       return {
          error: 'Registration failed'
@@ -189,7 +214,7 @@ exports.saveLogin = functions.https.onCall((data, context) => {
 });
 
 // УСТАНОВКА НАЧАЛЬНЫХ ЗНАЧЕНИЙ ПРОФИЛЯ
-exports.setInitialInfo = functions.https.onCall((data, context) => {
+exports.setInitialInfo = functions.region('europe-west3').https.onCall((data, context) => {
    if (context.auth?.token.login === undefined) {
       return {
          error: 'Login error!'
@@ -246,7 +271,7 @@ exports.setInitialInfo = functions.https.onCall((data, context) => {
 
 // ПУБЛИКАЦИЯ НОВОЙ СТАТЬИ
 
-exports.publishArticle = functions.https.onCall(async (data, context) => {
+exports.publishArticle = functions.region('europe-west3').https.onCall(async (data, context) => {
    if (
       context.auth?.uid === null ||
       (context.auth?.token.redactor === false && context.auth?.token.admin === false)
@@ -280,8 +305,8 @@ exports.publishArticle = functions.https.onCall(async (data, context) => {
                ...data.descrip,
                date: new Date(),
                lastEdited: new Date(),
-               likes: 0,
-               dislikes: 0,
+               likes: [],
+               dislikes: [],
                commentsCount: 0,
                viewsCount: 0,
                isShowing: true,
@@ -306,55 +331,419 @@ exports.publishArticle = functions.https.onCall(async (data, context) => {
 
 // ПОЛУЧИТЬ СТАТЬЮ (ОБЫЧНЫЙ ПОЛЬЗОВАТЕЛЬ)
 
-exports.getArticle = functions.https.onCall(async (data) => {
-   if (data.type !== 'article' && data.type !== 'review' && data.type !== 'news') {
+exports.getArticle = functions.region('europe-west3').https.onCall(async (data) => {
+   if (data.type !== 'article' && data.type !== 'review' && data.type !== 'news')
       return {
          error: 'Wrong type'
       };
-   }
-
-   const description = admin
-      .firestore()
-      .collection('articles')
-      .doc(data.id);
 
    const content = admin
       .firestore()
       .collection('articlesContent')
       .doc(data.id);
 
-   const comments = admin
-      .firestore()
-      .collection('comments')
-      .doc(data.id);
-
-   return description.get().then(async (doc) => {
+   return content.get().then(async (doc) => {
       try {
          if (doc.exists) {
-            const descriptionArticle = doc.data();
-            if (descriptionArticle!.isShowing) {
-               const contentArticle = (await content.get()).data();
-               const commentsArticle = (await comments.get()).data();
-               return {
-                  message: 'well done',
-                  result: {
-                     description: descriptionArticle,
-                     content: contentArticle,
-                     comments: commentsArticle
-                  }
-               };
-            } else
-               return {
-                  message: 'no article',
-                  result: null
-               };
+            const contentArticle = doc.data();
+
+            return {
+               message: 'well done',
+               result: {
+                  content: contentArticle
+               }
+            };
          } else
             return {
                message: 'no article',
                result: null
             };
       } catch (error_1) {
-         return error_1;
+         return {
+            message: error_1,
+            result: null
+         };
       }
    });
+});
+
+exports.sendComment = functions.region('europe-west3').https.onCall(async (data, context) => {
+   if (context.auth?.uid === null) {
+      return {
+         error: 'Publishing available only for logged users'
+      };
+   }
+
+   try {
+      const comments = admin
+         .firestore()
+         .collection('comments')
+         .doc(data.articleId);
+
+      const article = admin
+         .firestore()
+         .collection('articles')
+         .doc(data.articleId);
+
+      const commentsDoc = await comments.get();
+
+      const articleDoc = await article.get();
+
+      if (commentsDoc.exists && articleDoc.exists) {
+         const usersOpenData = (
+            await admin
+               .firestore()
+               .collection('usersOpen')
+               .doc(context.auth?.token.login)
+               .get()
+         ).data();
+
+         let photoUrl = null;
+
+         const chance = require('chance').Chance();
+
+         if (usersOpenData!.photo.length !== 0) {
+            photoUrl = `thumb@64_photo.jpg`;
+         }
+
+         await comments.update({
+            comments: admin.firestore.FieldValue.arrayUnion({
+               id: chance.string({ length: 20 }),
+               text: data.text,
+               userLogin: usersOpenData!.login,
+               userPhoto: photoUrl,
+               userName: usersOpenData!.name + ' ' + usersOpenData!.surname,
+               date: new Date(),
+               likes: [],
+               dislikes: []
+            })
+         });
+
+         await article.update({
+            commentsCount: admin.firestore.FieldValue.increment(1)
+         });
+
+         return {
+            message: 'comment added',
+            result: 'success'
+         };
+      } else
+         return {
+            message: 'no article with this comment',
+            result: null
+         };
+   } catch (e) {
+      return { message: e.message, result: null };
+   }
+});
+
+exports.likeComment = functions.region('europe-west3').https.onCall(async (data, context) => {
+   if (context.auth?.uid === null) {
+      return {
+         error: 'Like comments available only for authorized users'
+      };
+   }
+
+   try {
+      const comments = admin
+         .firestore()
+         .collection('comments')
+         .doc(data.articleId);
+
+      const commentsDoc = await comments.get();
+
+      if (commentsDoc.exists) {
+         const commentsData = commentsDoc.data();
+         const commentCahnge = commentsData!.comments.find(
+            (comment: any) => comment.id === data.commentId
+         );
+         if (commentCahnge !== undefined) {
+            await comments.update({
+               comments: admin.firestore.FieldValue.arrayRemove({ ...commentCahnge })
+            });
+            const isLiked = commentCahnge.likes.indexOf(context.auth?.token.login);
+            const isDisliked = commentCahnge.dislikes.indexOf(context.auth?.token.login);
+            if (isLiked !== -1) {
+               commentCahnge.likes.splice(isLiked, 1);
+            }
+            if (isDisliked !== -1) {
+               commentCahnge.dislikes.splice(isDisliked, 1);
+               commentCahnge.likes.push(context.auth?.token.login);
+            }
+            if (isLiked === -1 && isDisliked === -1) {
+               commentCahnge.likes.push(context.auth?.token.login);
+            }
+
+            await comments.update({
+               comments: admin.firestore.FieldValue.arrayUnion(commentCahnge)
+            });
+
+            return {
+               message: 'success like comment'
+            };
+         } else {
+            return {
+               message: 'failed like comment'
+            };
+         }
+      } else
+         return {
+            message: 'no article with this comment'
+         };
+   } catch (e) {
+      return { message: e.message };
+   }
+});
+
+exports.dislikeComment = functions.region('europe-west3').https.onCall(async (data, context) => {
+   if (context.auth?.uid === null) {
+      return {
+         error: 'Like comments available only for authorized users'
+      };
+   }
+
+   try {
+      const comments = admin
+         .firestore()
+         .collection('comments')
+         .doc(data.articleId);
+
+      const commentsDoc = await comments.get();
+
+      if (commentsDoc.exists) {
+         const commentsData = commentsDoc.data();
+         const commentCahnge = commentsData!.comments.find(
+            (comment: any) => comment.id === data.commentId
+         );
+         if (commentCahnge !== undefined) {
+            await comments.update({
+               comments: admin.firestore.FieldValue.arrayRemove({ ...commentCahnge })
+            });
+            const isLiked = commentCahnge.likes.indexOf(context.auth?.token.login);
+            const isDisliked = commentCahnge.dislikes.indexOf(context.auth?.token.login);
+            if (isLiked !== -1) {
+               commentCahnge.likes.splice(isLiked, 1);
+               commentCahnge.dislikes.push(context.auth?.token.login);
+            }
+            if (isDisliked !== -1) {
+               commentCahnge.dislikes.splice(isDisliked, 1);
+            }
+            if (isLiked === -1 && isDisliked === -1) {
+               commentCahnge.dislikes.push(context.auth?.token.login);
+            }
+
+            await comments.update({
+               comments: admin.firestore.FieldValue.arrayUnion(commentCahnge)
+            });
+
+            return {
+               message: 'success dislike comment'
+            };
+         } else {
+            return {
+               message: 'failed dislike comment'
+            };
+         }
+      } else
+         return {
+            message: 'no article with this comment'
+         };
+   } catch (e) {
+      return { message: e.message };
+   }
+});
+
+exports.deleteComment = functions.region('europe-west3').https.onCall(async (data, context) => {
+   if (context.auth?.uid === null) {
+      return {
+         error: 'Delete comments available only for authorized users'
+      };
+   }
+
+   try {
+      const comments = admin
+         .firestore()
+         .collection('comments')
+         .doc(data.articleId);
+
+      const article = admin
+         .firestore()
+         .collection('articles')
+         .doc(data.articleId);
+
+      const commentsDoc = await comments.get();
+
+      const articleDoc = await article.get();
+
+      if (commentsDoc.exists && articleDoc.exists) {
+         const commentsData = commentsDoc.data();
+         const commentDelete = commentsData!.comments.find(
+            (comment: any) => comment.id === data.commentId
+         );
+         if (
+            commentDelete !== undefined &&
+            (context.auth?.token.login === commentDelete.userLogin ||
+               context.auth?.token.admin === true)
+         ) {
+            await article.update({
+               commentsCount: admin.firestore.FieldValue.increment(-1)
+            });
+            await comments.update({
+               comments: admin.firestore.FieldValue.arrayRemove({ ...commentDelete })
+            });
+
+            return {
+               message: 'success delete comment'
+            };
+         } else {
+            return {
+               message: 'failed delete comment'
+            };
+         }
+      } else
+         return {
+            message: 'no article with this comment'
+         };
+   } catch (e) {
+      return { message: e.message };
+   }
+});
+
+exports.dislikeArticle = functions.region('europe-west3').https.onCall(async (data, context) => {
+   if (context.auth?.uid === null) {
+      return {
+         error: 'Dislike articles available only for authorized users'
+      };
+   }
+
+   try {
+      const article = admin
+         .firestore()
+         .collection('articles')
+         .doc(data.articleId);
+
+      const articleDoc = await article.get();
+
+      if (articleDoc.exists) {
+         const articleData = articleDoc.data();
+         if (articleData !== undefined) {
+            const isLiked = articleData.likes.indexOf(context.auth?.token.login);
+            const isDisliked = articleData.dislikes.indexOf(context.auth?.token.login);
+            if (isLiked !== -1) {
+               await article.update({
+                  likes: admin.firestore.FieldValue.arrayRemove(context.auth?.token.login)
+               });
+               await article.update({
+                  dislikes: admin.firestore.FieldValue.arrayUnion(context.auth?.token.login)
+               });
+            }
+            if (isDisliked !== -1) {
+               await article.update({
+                  dislikes: admin.firestore.FieldValue.arrayRemove(context.auth?.token.login)
+               });
+            }
+            if (isLiked === -1 && isDisliked === -1) {
+               await article.update({
+                  dislikes: admin.firestore.FieldValue.arrayUnion(context.auth?.token.login)
+               });
+            }
+
+            return {
+               message: 'success dislike article'
+            };
+         } else {
+            return {
+               message: 'failed dislike article'
+            };
+         }
+      } else
+         return {
+            message: 'no article with this id'
+         };
+   } catch (e) {
+      return { message: e.message };
+   }
+});
+
+exports.likeArticle = functions.region('europe-west3').https.onCall(async (data, context) => {
+   if (context.auth?.uid === null) {
+      return {
+         error: 'Like articles available only for authorized users'
+      };
+   }
+
+   try {
+      const article = admin
+         .firestore()
+         .collection('articles')
+         .doc(data.articleId);
+
+      const articleDoc = await article.get();
+
+      if (articleDoc.exists) {
+         const articleData = articleDoc.data();
+         if (articleData !== undefined) {
+            const isLiked = articleData.likes.indexOf(context.auth?.token.login);
+            const isDisliked = articleData.dislikes.indexOf(context.auth?.token.login);
+            if (isLiked !== -1) {
+               await article.update({
+                  likes: admin.firestore.FieldValue.arrayRemove(context.auth?.token.login)
+               });
+            }
+            if (isDisliked !== -1) {
+               await article.update({
+                  dislikes: admin.firestore.FieldValue.arrayRemove(context.auth?.token.login)
+               });
+               await article.update({
+                  likes: admin.firestore.FieldValue.arrayUnion(context.auth?.token.login)
+               });
+            }
+            if (isLiked === -1 && isDisliked === -1) {
+               await article.update({
+                  likes: admin.firestore.FieldValue.arrayUnion(context.auth?.token.login)
+               });
+            }
+
+            return {
+               message: 'success like article'
+            };
+         } else {
+            return {
+               message: 'failed like article'
+            };
+         }
+      } else
+         return {
+            message: 'no article with this id'
+         };
+   } catch (e) {
+      return { message: e.message };
+   }
+});
+
+exports.addView = functions.region('europe-west3').https.onCall(async (data) => {
+   try {
+      const article = admin
+         .firestore()
+         .collection('articles')
+         .doc(data.articleId);
+
+      const articleDoc = await article.get();
+
+      if (articleDoc.exists) {
+         await article.update({
+            viewsCount: admin.firestore.FieldValue.increment(1)
+         });
+
+         return {
+            message: 'success view added'
+         };
+      } else {
+         return {
+            message: 'failed view add'
+         };
+      }
+   } catch (e) {
+      return { message: e.message };
+   }
 });

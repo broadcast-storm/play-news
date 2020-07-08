@@ -29,12 +29,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ className, isYourAccount, isRedacto
                activeClassName={styles['link-active']}>
                Блог
             </NavLink>
-            <NavLink
-               to={Routes.userPageScreens.comments.replace(':login', login)}
-               className={styles['link-item']}
-               activeClassName={styles['link-active']}>
-               Комментарии
-            </NavLink>
             {/* В меню добавляются ссылки, в зависимости от того, редактор ли пользователь 
             и просматривает ли он свой личный кабинет */}
             {isYourAccount ? (
