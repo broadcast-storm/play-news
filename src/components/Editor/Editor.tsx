@@ -494,17 +494,17 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
                <ListItem
                   news={{
                      id: resultUrl,
-                     imgUrl: smallPhotoUrl,
+                     smallPhotoUrl: smallPhotoUrl,
                      header: header,
-                     descrip: annotation,
+                     annotation: annotation,
                      date: new Date(),
                      author: viewedUserOpenInfo.name + ' ' + viewedUserOpenInfo.surname,
-                     author_id: login,
-                     type: articleType,
-                     views: 0,
-                     comments: 0,
-                     likes: 0,
-                     dislikes: 0
+                     authorLink: login,
+                     articleType: articleType,
+                     viewsCount: 0,
+                     commentsCount: 0,
+                     likes: [],
+                     dislikes: []
                   }}
                />
                <br />
@@ -512,20 +512,21 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
                <br />
                <NewsSlider
                   isTest={true}
+                  listIsLoading={false}
                   NewsArray={[
                      {
                         id: resultUrl,
-                        imgUrl: smallPhotoUrl,
+                        smallPhotoUrl: smallPhotoUrl,
                         header: header,
                         descrip: annotation,
                         date: new Date(),
                         author: viewedUserOpenInfo.name + ' ' + viewedUserOpenInfo.surname,
-                        author_id: login,
-                        type: articleType,
-                        views: 0,
-                        comments: 0,
-                        likes: 0,
-                        dislikes: 0
+                        authorLink: login,
+                        articleType: articleType,
+                        viewsCount: 0,
+                        commentsCount: 0,
+                        likes: [],
+                        dislikes: []
                      }
                   ]}
                />

@@ -10,17 +10,17 @@ import styles from './styles.module.scss';
 
 type NewsType = {
    id: string;
-   imgUrl: string;
+   smallPhotoUrl: string;
    header: string;
-   descrip: string;
+   annotation: string;
    date: any;
    author: string;
-   author_id: string;
-   type: string;
-   views: number;
-   comments: number;
-   likes: number;
-   dislikes: number;
+   authorLink: string;
+   articleType: string;
+   viewsCount: number;
+   commentsCount: number;
+   likes: Array<string>;
+   dislikes: Array<string>;
 };
 
 type ListItemProps = {
@@ -32,41 +32,47 @@ type ListItemProps = {
 // Выводит иформацию о статье, передаваемую через props
 const ListItem: React.FC<ListItemProps> = ({ className, news }) => {
    function formatDate(date: any) {
-      var dd = date.getDate();
+      let _date: any;
+      if (!(date instanceof Date)) {
+         _date = new Date(date.seconds * 1000);
+      } else _date = date;
+      var dd = _date.getDate();
       if (dd < 10) dd = '0' + dd;
 
-      var mm = date.getMonth() + 1;
+      var mm = _date.getMonth() + 1;
       if (mm < 10) mm = '0' + mm;
 
-      return dd + '.' + mm + '.' + date.getFullYear();
+      return dd + '.' + mm + '.' + _date.getFullYear();
    }
    return (
       <div className={styles['news-item']}>
          <div className={styles['news-item__picture']}>
-            {news.imgUrl === 'File Not Found' || news.imgUrl === '' ? (
+            {news.smallPhotoUrl === 'File Not Found' || news.smallPhotoUrl === '' ? (
                <div className={styles['emptyPhoto']}>
                   <span>Нет фото</span>
                </div>
             ) : (
-               <img src={news.imgUrl} alt="" className={styles['picture__img']} />
+               <img src={news.smallPhotoUrl} alt="" className={styles['picture__img']} />
             )}
          </div>
          <div className={styles['news-item__text']}>
             <h2 className={styles['text__header']}>
                <NavLink
-                  to={Routes.mainText.article.replace(':id', news.id).replace(':type', news.type)}
+                  to={Routes.mainText.article
+                     .replace(':id', news.id)
+                     .replace(':type', news.articleType)}
                   className={styles['text__header__link']}>
                   {news.header === '' ? 'Пустое название статьи' : news.header}
                </NavLink>
             </h2>
             <p className={styles['text__descrip']}>
-               {news.descrip === '' ? 'Пустая аннотация к новой статье...' : news.descrip}
+               {news.annotation === '' ? 'Пустая аннотация к новой статье...' : news.annotation}
             </p>
             <div className={styles['text__row']}>
                <div>
                   <span className={styles['date']}>{formatDate(news.date)}</span>
                   <NavLink
-                     to={Routes.userPage.replace(':login', news.author_id)}
+                     to={Routes.userPage.replace(':login', news.authorLink)}
                      className={styles['author']}>
                      {news.author}
                   </NavLink>
@@ -74,28 +80,28 @@ const ListItem: React.FC<ListItemProps> = ({ className, news }) => {
                <div>
                   <span className={styles['likes']}>
                      <img src={LikesDislikes} alt="" />{' '}
-                     <span className={styles['green']}>{news.likes}</span>
+                     <span className={styles['green']}>{news.likes.length}</span>
                      {' / '}
-                     <span className={styles['red']}>{news.dislikes}</span>
+                     <span className={styles['red']}>{news.dislikes.length}</span>
                   </span>
                   <span className={styles['type']}>
-                     {news.type === 'news'
+                     {news.articleType === 'news'
                         ? 'Новости'
-                        : news.type === 'articles'
+                        : news.articleType === 'articles'
                         ? 'Статьи'
-                        : news.type === 'reviews'
+                        : news.articleType === 'reviews'
                         ? 'Обзоры'
                         : ''}
                   </span>
                   <span>
                      {' '}
                      <img src={EyeImg} alt="views" className={styles['views-img']} />
-                     {news.views}
+                     {news.viewsCount}
                   </span>
                   <span>
                      {' '}
                      <img src={Comment} alt="views" className={styles['comments-img']} />
-                     {news.comments}
+                     {news.commentsCount}
                   </span>
                </div>
             </div>

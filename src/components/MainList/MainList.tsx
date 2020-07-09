@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { CircleSpinner } from 'react-spinners-kit';
 import ListItem from './ListItem';
 import LoadMore from '@components/LoadMore';
 import Routes from '@config/routes';
+import classNames from 'classnames';
 
 import SendImg from '@img/news/send.svg';
 import SendHoverImg from '@img/news/sendHover.svg';
 import SearchImg from '@img/news/search.png';
-
-// Временный массив статей (для разработки)
-import { NewsArray } from '../../mocks/index';
 
 import styles from './styles.module.scss';
 
@@ -30,7 +29,9 @@ const MainList: React.FC<MainListProps> = ({
    authUser,
    navbarInfo
 }) => {
-   const [type, setType] = useState('editors');
+   const [type, setType] = useState('redactor');
+   const [tags, setTags] = useState<string>('');
+   const [headerSearch, setHeaderSearch] = useState('');
    const [imgUrl, setImgUrl] = useState(SendImg);
 
    const [isShowing, setIsShowing] = useState(4);
@@ -39,32 +40,60 @@ const MainList: React.FC<MainListProps> = ({
 
    const [listIsLoading, setListIsLoading] = useState(true);
 
+   const { db } = useSelector((state: any) => state.firebase);
+
    // Изменить тип выводимых статей (написанные читателями или редакторами)
    const clickHandler = (type: string) => {
       setType(type);
    };
    const [userLogin, setUserLogin] = useState(null);
 
-   // Функция загрузки статей
-   const loadItems = () => {
-      setListIsLoading(true);
-      setTimeout(() => {
-         setItemsList(NewsArray);
-         setListIsLoading(false);
-      }, 400);
-   };
-
    // Начать загрузку статей, когда компонент загружен
    useEffect(() => {
-      loadItems();
-   }, []);
-
-   // При изменении пути URL (при смене категории статей: обзорыЮ новости и т д) обновлять статьи
-   useEffect(() => {
-      setListIsLoading(true);
       setItemsList(null);
-      loadItems();
-   }, [location.pathname]);
+      setListIsLoading(true);
+      const query = db.collection('articles').where('isShowing', '==', true);
+      const filterArticleType = query.where(
+         'articleType',
+         '==',
+         location.pathname === Routes.mainPage
+            ? 'news'
+            : location.pathname === Routes.mainCategories.reviews
+            ? 'reviews'
+            : location.pathname === Routes.mainCategories.articles
+            ? 'articles'
+            : null
+      );
+      const filterTag =
+         tags === '' ? filterArticleType : filterArticleType.where('tags', 'array-contains', tags);
+
+      const filterAuthorType = filterTag.where('authorType', '==', type);
+
+      const observer = filterAuthorType.onSnapshot(
+         (querySnapshot: any) => {
+            const docSnaps = querySnapshot.docs;
+            const articles = [];
+            for (var i in docSnaps) {
+               articles.push(docSnaps[i].data());
+            }
+            console.log(articles);
+            setItemsList(
+               articles.sort(function(a, b) {
+                  return b.date.seconds - a.date.seconds;
+               })
+            );
+            setListIsLoading(false);
+         },
+         (err: any) => {
+            console.log(`Error loading articles: ${err}`);
+         }
+      );
+      return () => {
+         observer();
+      };
+      // eslint-disable-next-line
+   }, [type, tags, location.pathname]);
+
    // Если пользователь авторизован, то сохранить его лоигн для добавления в ссылку
    useEffect(() => {
       if (authUser !== null)
@@ -80,15 +109,15 @@ const MainList: React.FC<MainListProps> = ({
                <div className={styles['news-type-change']}>
                   <button
                      className={styles['news-type']}
-                     disabled={type === 'editors'}
-                     onClick={() => clickHandler('editors')}>
+                     disabled={type === 'redactor'}
+                     onClick={() => clickHandler('redactor')}>
                      редакционное
                   </button>
                   <span>&nbsp;/&nbsp;</span>
                   <button
                      className={styles['news-type']}
-                     disabled={type === 'readers'}
-                     onClick={() => clickHandler('readers')}>
+                     disabled={type === 'user'}
+                     onClick={() => clickHandler('user')}>
                      читательское
                   </button>
                </div>
@@ -128,31 +157,71 @@ const MainList: React.FC<MainListProps> = ({
                      ? 'Статьи'
                      : null}
                </h2>
-               <div className={styles['search-container']}>
-                  <input
-                     type="text"
-                     className={styles['search-container__input']}
-                     placeholder={'Поиск'}
-                  />
-                  <button className={styles['search-container__btn']}>
-                     <img src={SearchImg} alt="search" />
-                  </button>
+               <div className={styles['search-part']}>
+                  <select
+                     className={classNames(styles['input'], styles['article-type'])}
+                     required
+                     title="Выберите один тег"
+                     onChange={(e) => {
+                        if (e.target.value === 'none') setTags('');
+                        else setTags(e.target.value);
+                     }}>
+                     <option
+                        value="none"
+                        style={{
+                           backgroundColor: '#E5E5E5',
+                           fontStyle: 'italic',
+                           color: 'gray'
+                        }}>
+                        По тегу
+                     </option>
+                     <option value="pc">PC</option>
+                     <option value="xbox">Xbox</option>
+                     <option value="ps4">PS4</option>
+                     <option value="shooter">Шутеры</option>
+                     <option value="strategy">Стратегии</option>
+                     <option value="rpg">RPG</option>
+                     <option value="racing">Гонки</option>
+                     <option value="e3">E3</option>
+                     <option value="exclusive">Эксклюзивы</option>
+                     <option value="simulator">Симуляторы</option>
+                  </select>
+
+                  <div className={styles['search-container']}>
+                     <input
+                        type="text"
+                        className={styles['search-container__input']}
+                        placeholder={'Поиск'}
+                        value={headerSearch}
+                        onChange={(e) => setHeaderSearch(e.target.value)}
+                     />
+                     <button className={styles['search-container__btn']}>
+                        <img src={SearchImg} alt="search" />
+                     </button>
+                  </div>
                </div>
             </div>
             {listIsLoading ? (
                <div className={styles['loader']}>
                   <CircleSpinner size={40} color="#f2cb04" />
                </div>
+            ) : itemsList.length === 0 ? (
+               <div className={styles['loader']}>
+                  <span>Таких статей еще нет =(</span>
+               </div>
             ) : (
                <>
-                  {itemsList.slice(0, isShowing).map((item: any) => (
-                     <ListItem news={item} key={item.id} />
-                  ))}
+                  {itemsList
+                     .filter((item: any) => item.header.includes(headerSearch))
+                     .slice(0, isShowing)
+                     .map((item: any) => (
+                        <ListItem news={item} key={item.id} />
+                     ))}
                </>
             )}
          </div>
-         {/* В зависимости от кол-ва видимых статей меняется действие функции нажатия на кнопку LOadMore */}
-         {listIsLoading ? null : isShowing < itemsList.length ? (
+         {/* В зависимости от кол-ва видимых статей меняется действие функции нажатия на кнопку LoadMore */}
+         {listIsLoading || itemsList.length < 5 ? null : isShowing < itemsList.length ? (
             <LoadMore onClick={() => setIsShowing((prev) => prev + 3)} />
          ) : (
             <LoadMore onClick={() => setIsShowing(4)} reverse={true} />
