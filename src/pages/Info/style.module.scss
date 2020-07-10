@@ -1,4 +1,5 @@
 .info-page {
+   background-color: white;
    .main-picture {
       &__picture-container {
          width: 100%;
@@ -45,5 +46,39 @@
             width: 100%;
          }
       }
+   }
+   .roles {
+      padding: 50px 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      flex-wrap: wrap;
+
+      .role {
+         width: 300px;
+         min-height: 315px;
+         padding: 40px 10px;
+         border-radius: 10px;
+         display: flex;
+         flex-direction: column;
+         justify-content: flex-start;
+         align-items: center;
+         background-color: #182126;
+         color: white;
+         text-align: center;
+
+         .img-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            img {
+               width: 30%;
+            }
+         }
+      }
+   }
+
+   .second-picture-container {
+      height: 500px;
    }
 }
