@@ -21,6 +21,12 @@ const USER_INFO_UPDATED = 'USER_INFO_UPDATED';
 const START_PUBLISHING = 'START_PUBLISHING';
 const SUCCESS_FINISH_PUBLISHING = 'SUCCESS_FINISH_PUBLISHING';
 
+const START_DELETING_DRAFT = 'START_DELETING_DRAFT';
+const FINISH_DELETING_DRAFT = 'FINISH_DELETING_DRAFT';
+
+const START_LOADING_DRAFT = 'START_LOADING_DRAFT';
+const FINISH_LOADING_DRAFT = 'FINISH_LOADING_DRAFT';
+
 // ИНИЦИАЛИЗАЦИЯ FIREBASE
 export function firebaseInit() {
    return async (dispatch, getState) => {
@@ -465,57 +471,92 @@ export function publishArticle(
    tags,
    url,
    author,
-   authorLink
+   authorLink,
+   oldId,
+   authorType
 ) {
    return (dispatch, getState) => {
       const { firebase } = getState();
       dispatch({ type: START_PUBLISHING });
       firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
-         if (idTokenResult.claims.redactor === true || idTokenResult.claims.admin === true) {
-            var mainPhotoRef = firebase.storageRef.child(`articles/${url}/${url}.jpg`);
-            var smallPhotoRef = firebase.storageRef.child(`articles/${url}/${url}_small.jpg`);
-            mainPhotoRef.put(mainPhoto).then(async function(snapshot) {
-               smallPhotoRef.put(smallPhoto).then(async function(snapshot) {
-                  const mainPhotoUrl = await firebase.storageRef
-                     .child(`articles/${url}/${url}.jpg`)
-                     .getDownloadURL();
-                  const smallPhotoUrl = await firebase.storageRef
-                     .child(`articles/${url}/${url}_small.jpg`)
-                     .getDownloadURL();
-
-                  const publishArticle = firebase.functions.httpsCallable('publishArticle');
-
-                  const result = await publishArticle({
-                     descrip: {
-                        id: url,
-                        header: header,
-                        author: author,
-                        authorLink: authorLink,
-                        articleType: articleType,
-                        mainPhotoUrl: mainPhotoUrl,
-                        smallPhotoUrl: smallPhotoUrl,
-                        tags: tags,
-                        annotation: annotation
-                     },
-                     content: articleContent
-                  });
-
-                  console.log(result);
-
-                  dispatch({ type: SUCCESS_FINISH_PUBLISHING });
-
-                  // const contentResult = await firebase.db
-                  //    .collection('articlesContent')
-                  //    .doc(url)
-                  //    .set({
-                  //       content: articleContent,
-                  //       redactor: redactorLogin
-                  //    });
-
-                  // console.log(contentResult);
-               });
-            });
+         if (oldId !== url && oldId !== null) {
+            await firebase.storageRef.child(`articles/${oldId}/${oldId}.jpg`).delete();
+            await firebase.storageRef.child(`articles/${oldId}/${oldId}_small.jpg`).delete();
          }
+
+         var mainPhotoRef = firebase.storageRef.child(`articles/${url}/${url}.jpg`);
+         var smallPhotoRef = firebase.storageRef.child(`articles/${url}/${url}_small.jpg`);
+         mainPhotoRef.put(mainPhoto).then(async function(snapshot) {
+            smallPhotoRef.put(smallPhoto).then(async function(snapshot) {
+               const mainPhotoUrl = await firebase.storageRef
+                  .child(`articles/${url}/${url}.jpg`)
+                  .getDownloadURL();
+               const smallPhotoUrl = await firebase.storageRef
+                  .child(`articles/${url}/${url}_small.jpg`)
+                  .getDownloadURL();
+
+               const publishArticle = firebase.functions.httpsCallable('publishArticle');
+
+               const result = await publishArticle({
+                  descrip: {
+                     id: url,
+                     header: header,
+                     author: author,
+                     authorLink: authorLink,
+                     articleType: articleType,
+                     mainPhotoUrl: mainPhotoUrl,
+                     smallPhotoUrl: smallPhotoUrl,
+                     tags: tags,
+                     annotation: annotation,
+                     authorType
+                  },
+                  oldId,
+                  content: articleContent
+               });
+
+               console.log(result);
+
+               dispatch({ type: SUCCESS_FINISH_PUBLISHING });
+            });
+         });
+      });
+   };
+}
+
+export function deleteDraft(draftId) {
+   return (dispatch, getState) => {
+      const { firebase } = getState();
+      dispatch({ type: START_DELETING_DRAFT });
+      firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
+         const deleteDraft = firebase.functions.httpsCallable('deleteDraft');
+
+         const result = await deleteDraft({
+            draftId
+         });
+         await firebase.storageRef.child(`articles/${draftId}/${draftId}.jpg`).delete();
+         await firebase.storageRef.child(`articles/${draftId}/${draftId}_small.jpg`).delete();
+
+         console.log(result);
+
+         dispatch({ type: FINISH_DELETING_DRAFT });
+      });
+   };
+}
+
+export function getDraft(draftId) {
+   return (dispatch, getState) => {
+      const { firebase } = getState();
+      dispatch({ type: START_LOADING_DRAFT });
+      firebase.auth.currentUser.getIdTokenResult().then(async (idTokenResult) => {
+         const getDraft = firebase.functions.httpsCallable('getUserDraft');
+
+         const result = await getDraft({
+            draftId
+         });
+
+         console.log(result);
+
+         dispatch({ type: FINISH_LOADING_DRAFT });
       });
    };
 }

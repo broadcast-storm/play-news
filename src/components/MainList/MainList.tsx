@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { useSelector } from 'react-redux';
 import { NavLink, withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
 import { CircleSpinner } from 'react-spinners-kit';
 import ListItem from './ListItem';
 import LoadMore from '@components/LoadMore';
@@ -18,17 +18,10 @@ type MainListProps = {
    className?: string | null;
    location: any;
    match: any;
-   authUser: any;
    navbarInfo: any;
 };
 
-const MainList: React.FC<MainListProps> = ({
-   className,
-   location,
-   match,
-   authUser,
-   navbarInfo
-}) => {
+const MainList: React.FC<MainListProps> = ({ className, location, match, navbarInfo }) => {
    const [type, setType] = useState('redactor');
    const [tags, setTags] = useState<string>('');
    const [headerSearch, setHeaderSearch] = useState('');
@@ -40,7 +33,7 @@ const MainList: React.FC<MainListProps> = ({
 
    const [listIsLoading, setListIsLoading] = useState(true);
 
-   const { db } = useSelector((state: any) => state.firebase);
+   const { db, authUser } = useSelector((state: any) => state.firebase);
 
    // Изменить тип выводимых статей (написанные читателями или редакторами)
    const clickHandler = (type: string) => {
@@ -104,6 +97,18 @@ const MainList: React.FC<MainListProps> = ({
 
    return (
       <>
+         <Helmet>
+            <title>
+               Play News{' '}
+               {location.pathname === Routes.mainPage
+                  ? ' | Новости'
+                  : location.pathname === Routes.mainCategories.reviews
+                  ? ' | Обзоры'
+                  : location.pathname === Routes.mainCategories.articles
+                  ? ' | Статьи'
+                  : null}
+            </title>
+         </Helmet>
          <div className={styles['news-list']}>
             <div className={styles['row']}>
                <div className={styles['news-type-change']}>
@@ -212,7 +217,7 @@ const MainList: React.FC<MainListProps> = ({
             ) : (
                <>
                   {itemsList
-                     .filter((item: any) => item.header.includes(headerSearch))
+                     .filter((item: any) => item.header.includes(headerSearch.toUpperCase()))
                      .slice(0, isShowing)
                      .map((item: any) => (
                         <ListItem news={item} key={item.id} />
@@ -235,10 +240,4 @@ MainList.defaultProps = {
 };
 
 // @ts-ignore
-const mapStateToProps = ({ firebase }) => {
-   return {
-      ...firebase
-   };
-};
-// @ts-ignore
-export default withRouter(connect(mapStateToProps, null)(MainList));
+export default withRouter(MainList);

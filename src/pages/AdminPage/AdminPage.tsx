@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import LogOut from '@components/LogOut';
 import { useSelector, useDispatch } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -71,30 +72,35 @@ const AdminPage: React.FC<AdminProps> = ({ match, history }) => {
       );
 
    return (
-      <div className={styles['userContainer']}>
-         <div className={styles['userContainer__contentContainer']}>
-            <div className={styles['topInfo']}>
-               <div className={styles['topInfo__photo']}>
-                  <img
-                     src={viewedUserPhoto !== null ? viewedUserPhoto : DefaultUserImg}
-                     className={styles['image']}
-                     alt=""
-                  />
-               </div>
-
-               <div className={styles['topInfo__text']}>
-                  <div className={styles['top']}>
-                     <span className={styles['name']}>
-                        {viewedUserOpenInfo.name + ' ' + viewedUserOpenInfo.surname}
-                     </span>
-                     <LogOut />
+      <>
+         <Helmet>
+            <title>Административная панель</title>
+         </Helmet>
+         <div className={styles['userContainer']}>
+            <div className={styles['userContainer__contentContainer']}>
+               <div className={styles['topInfo']}>
+                  <div className={styles['topInfo__photo']}>
+                     <img
+                        src={viewedUserPhoto !== null ? viewedUserPhoto : DefaultUserImg}
+                        className={styles['image']}
+                        alt=""
+                     />
                   </div>
-                  <span className={styles['role']}>Админ</span>
+
+                  <div className={styles['topInfo__text']}>
+                     <div className={styles['top']}>
+                        <span className={styles['name']}>
+                           {viewedUserOpenInfo.name + ' ' + viewedUserOpenInfo.surname}
+                        </span>
+                        <LogOut />
+                     </div>
+                     <span className={styles['role']}>Админ</span>
+                  </div>
                </div>
+               <h2>Админ панель</h2> <span>(в разработке)</span>
             </div>
-            <h2>Админ панель</h2> <span>(в разработке)</span>
          </div>
-      </div>
+      </>
    );
 };
 

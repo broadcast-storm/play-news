@@ -1,0 +1,131 @@
+.news-item {
+   display: flex;
+   margin-bottom: 15px;
+
+   &__picture {
+      flex: 35%;
+      position: relative;
+      min-height: 170px;
+      background-color: gray;
+
+      .picture__img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+         position: absolute;
+         top: 0;
+         left: 0;
+      }
+      .emptyPhoto {
+         width: 100%;
+         height: 100%;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+      }
+   }
+
+   &__text {
+      flex: 65%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-left: 10px;
+      min-height: 170px;
+
+      .text__header {
+         font-size: 20px;
+         font-weight: bold;
+         &__link {
+            color: black;
+            word-break: break-all;
+         }
+         &__link:hover {
+            text-decoration: none;
+            color: #f2cb04;
+         }
+      }
+
+      .text__descrip {
+         color: gray;
+         margin-bottom: 20px;
+         word-break: break-all;
+      }
+
+      .date,
+      .type {
+         padding-right: 15px;
+         margin-right: 15px;
+         border-right: 1px solid gray;
+      }
+
+      .date {
+         color: #f2cb04;
+         cursor: pointer;
+      }
+      .author {
+         cursor: pointer;
+         color: #c90e0e;
+      }
+
+      .text__row {
+         color: gray;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+
+         .status {
+            min-width: 200px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            background-color: #f2cb04;
+            color: white;
+         }
+         .red {
+            background-color: #c90e0e;
+         }
+      }
+   }
+
+   @media (max-width: 1024px) {
+      &__picture {
+         flex: 35%;
+      }
+
+      &__text {
+         flex: 65%;
+      }
+      .text__header {
+         font-size: 18px;
+      }
+
+      .text__row {
+         flex-direction: column;
+         font-size: 12px;
+      }
+   }
+
+   @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: left;
+      padding-bottom: 10px;
+      border-bottom: 1px solid gray;
+      &__picture {
+         flex: 100%;
+      }
+
+      &__text {
+         padding-left: 0;
+         flex: 100%;
+      }
+      .text__header {
+         font-size: 18px;
+      }
+
+      .text__row {
+         flex-direction: column;
+         font-size: 12px;
+      }
+   }
+}

@@ -4,7 +4,6 @@ import * as admin from 'firebase-admin';
 import { tmpdir } from 'os';
 import { join, dirname } from 'path';
 
-// import algoliasearch from 'algoliasearch';
 import * as sharp from 'sharp';
 import * as fs from 'fs-extra';
 
@@ -12,28 +11,7 @@ import * as fs from 'fs-extra';
 
 admin.initializeApp();
 
-// const env = functions.config();
-
-// const client = algoliasearch(env.algolia.app_id, env.algolia.api_key);
-// const indexArticles = client.initIndex('Articles');
-
 const gcs = admin.storage();
-
-// exports.onArticleCreated = functions
-//    .region('europe-west3')
-//    .firestore.document('articles/{articleId}')
-//    .onCreate((snap, context) => {
-//       const article = snap.data();
-//       article.objectID = context.params.articleId;
-//       return indexArticles.saveObject(article);
-//    });
-
-// exports.onArticleDeleted = functions
-//    .region('europe-west3')
-//    .firestore.document('articles/{articleId}')
-//    .onDelete((snap, context) => {
-//       return indexArticles.deleteObject(context.params.articleId);
-//    });
 
 // СОЗДАНИЕ ОПТИМИЗИРОВАННЫХ ФОТОГРАФИЙ ПРИ СМЕНЕ ФОТО ПРОФИЛЯ
 exports.generateThumbs = functions
@@ -272,14 +250,30 @@ exports.setInitialInfo = functions.region('europe-west3').https.onCall((data, co
 // ПУБЛИКАЦИЯ НОВОЙ СТАТЬИ
 
 exports.publishArticle = functions.region('europe-west3').https.onCall(async (data, context) => {
-   if (
-      context.auth?.uid === null ||
-      (context.auth?.token.redactor === false && context.auth?.token.admin === false)
-   ) {
+   if (context.auth?.uid === null) {
       return {
-         error: 'Publishing available only for redactors or admins'
+         error: 'Publishing available only for authorized users'
       };
    }
+   if (data.oldId !== data.descrip.id && data.oldId !== null) {
+      await admin
+         .firestore()
+         .collection('articles')
+         .doc(data.oldId)
+         .delete();
+      await admin
+         .firestore()
+         .collection('articlesContent')
+         .doc(data.oldId)
+         .delete();
+      await admin
+         .firestore()
+         .collection('comments')
+         .doc(data.oldId)
+         .delete();
+   }
+   const isUser = context.auth?.token.redactor === false && context.auth?.token.admin === false;
+
    const article = admin
       .firestore()
       .collection('articles')
@@ -313,7 +307,8 @@ exports.publishArticle = functions.region('europe-west3').https.onCall(async (da
                isShowingComments: true,
                isEditing: false,
                isBlockedComments: false,
-               redactor: context.auth?.token.login
+               redactor: isUser ? null : context.auth?.token.login,
+               redactorAnswer: ''
             });
             try {
                await articleContent.set({
@@ -332,7 +327,7 @@ exports.publishArticle = functions.region('europe-west3').https.onCall(async (da
 // ПОЛУЧИТЬ СТАТЬЮ (ОБЫЧНЫЙ ПОЛЬЗОВАТЕЛЬ)
 
 exports.getArticle = functions.region('europe-west3').https.onCall(async (data) => {
-   if (data.type !== 'article' && data.type !== 'review' && data.type !== 'news')
+   if (data.type !== 'articles' && data.type !== 'reviews' && data.type !== 'news')
       return {
          error: 'Wrong type'
       };
@@ -746,4 +741,119 @@ exports.addView = functions.region('europe-west3').https.onCall(async (data) => 
    } catch (e) {
       return { message: e.message };
    }
+});
+
+exports.deleteDraft = functions.region('europe-west3').https.onCall(async (data, context) => {
+   if (context.auth?.uid === null) {
+      return {
+         error: 'Delete draft available only for authorized users'
+      };
+   }
+
+   try {
+      const article = admin
+         .firestore()
+         .collection('articles')
+         .doc(data.draftId);
+
+      const articleDoc = await article.get();
+
+      if (articleDoc.exists) {
+         const articleData = articleDoc.data();
+         if (
+            articleData !== undefined &&
+            articleData.isEditing &&
+            context.auth?.token.login === articleData.authorLink
+         ) {
+            await article.delete();
+
+            await admin
+               .firestore()
+               .collection('comments')
+               .doc(data.draftId)
+               .delete();
+            await admin
+               .firestore()
+               .collection('articlesContent')
+               .doc(data.draftId)
+               .delete();
+
+            return {
+               message: 'success delete draft'
+            };
+         } else {
+            return {
+               message: 'failed delete draft'
+            };
+         }
+      } else
+         return {
+            message: 'no draft for deleting'
+         };
+   } catch (e) {
+      return { message: e.message };
+   }
+});
+
+exports.getUserDraft = functions.region('europe-west3').https.onCall(async (data, context) => {
+   if (context.auth?.uid === null) {
+      return {
+         error: 'Get draft available only for authorized users'
+      };
+   }
+   const description = admin
+      .firestore()
+      .collection('articles')
+      .doc(data.draftId);
+
+   return description.get().then(async (doc) => {
+      try {
+         if (doc.exists) {
+            const descripDraft = doc.data();
+
+            if (
+               descripDraft !== undefined &&
+               descripDraft.isEditing &&
+               (context.auth?.token.login === descripDraft.authorLink ||
+                  context.auth?.token.redactor === true ||
+                  context.auth?.token.admin === true)
+            ) {
+               const content = admin
+                  .firestore()
+                  .collection('articlesContent')
+                  .doc(data.draftId);
+
+               const contentDraft = (await content.get()).data();
+
+               console.log({
+                  content: contentDraft,
+                  description: descripDraft,
+                  oldId: descripDraft.id
+               });
+
+               return {
+                  message: 'well done',
+                  result: {
+                     content: contentDraft,
+                     description: descripDraft,
+                     oldId: descripDraft.id
+                  }
+               };
+            } else
+               return {
+                  message: 'no access to this draft',
+                  result: null
+               };
+         } else
+            return {
+               message: 'no draft',
+               result: null
+            };
+      } catch (error_1) {
+         return {
+            message: error_1,
+            result: null
+         };
+      }
+   });
 });

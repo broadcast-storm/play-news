@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import 'firebase/auth';
 import 'firebase/database';
 import { firebaseInit, startAuthStateChangeCheck } from '@actions/firebase';
@@ -13,14 +14,6 @@ import { Route, Switch, withRouter } from 'react-router-dom';
 import loadable from '@loadable/component';
 // @ts-ignore
 import pMinDelay from 'p-min-delay';
-
-// Основные страницы сайта
-// import UserPage from '@pages/UserPage';
-// import AdminPage from '@pages/AdminPage';
-// import Login from '@pages/Login';
-// import Main from '@pages/Main';
-// import ArticlePage from '@pages/ArticlePage';
-// import Info from '@pages/Info';
 
 import Footer from '@components/Footer';
 
@@ -62,6 +55,9 @@ const App: React.FC = ({ location }) => {
 
    return (
       <>
+         <Helmet>
+            <title>Play News</title>
+         </Helmet>
          <div
             className={
                !location.pathname.includes(Routes.loginPage)

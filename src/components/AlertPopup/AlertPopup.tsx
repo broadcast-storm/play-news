@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-
+import { CircleSpinner } from 'react-spinners-kit';
 import CloseImg from '@img/alert/close.png';
 import CloseWhiteImg from '@img/alert/closeWhite.png';
 
@@ -34,16 +34,30 @@ const AlertPopup: React.FC<AlertPopupProps> = ({
                   status === 'Alert' ? styles['alert'] : status === 'Error' ? styles['error'] : null
                )}>
                <span>
-                  {status === 'Alert' ? 'Предупреждение' : status === 'Error' ? 'Ошибка' : null}
+                  {setShowAlert === null
+                     ? 'Подождите'
+                     : status === 'Alert'
+                     ? 'Предупреждение'
+                     : status === 'Error'
+                     ? 'Ошибка'
+                     : null}
                </span>
-               <img
-                  src={
-                     status === 'Alert' ? CloseImg : status === 'Error' ? CloseWhiteImg : undefined
-                  }
-                  alt=""
-                  className={styles['exitImg']}
-                  onClick={() => setShowAlert(false)}
-               />
+               {setShowAlert === null ? (
+                  <CircleSpinner size={20} color="#182126" />
+               ) : (
+                  <img
+                     src={
+                        status === 'Alert'
+                           ? CloseImg
+                           : status === 'Error'
+                           ? CloseWhiteImg
+                           : undefined
+                     }
+                     alt=""
+                     className={styles['exitImg']}
+                     onClick={() => setShowAlert(false)}
+                  />
+               )}
             </div>
             <div className={styles['text']}>
                <span>{messageText}</span>

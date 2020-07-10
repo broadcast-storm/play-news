@@ -31,7 +31,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ className, isYourAccount, isRedacto
             </NavLink>
             {/* В меню добавляются ссылки, в зависимости от того, редактор ли пользователь 
             и просматривает ли он свой личный кабинет */}
-            {isYourAccount ? (
+            {isYourAccount && !isRedactor ? (
                <NavLink
                   to={Routes.userPageScreens.drafts.replace(':login', login)}
                   className={styles['link-item']}

@@ -4,9 +4,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import Routes from '@config/routes';
 
 import Resizer from 'react-image-file-resizer';
-
+import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
-
+import AlertPopup from '@components/AlertPopup';
 import Article from '@components/Article';
 import ListItem from '@components/MainList/ListItem';
 import NewsSlider from '@components/NewsSlider';
@@ -24,6 +24,8 @@ import styles from './styles.module.scss';
 
 type EditorArticleProps = {
    className?: string | null;
+   isRedactor: boolean;
+   history?: any;
 };
 
 const transliterate = (text: string) => {
@@ -100,10 +102,10 @@ const transliterate = (text: string) => {
    return translite_text;
 };
 
-const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
+const EditorArticle: React.FC<EditorArticleProps> = ({ className, isRedactor, history }) => {
    const dispatch = useDispatch();
    const mainPhotoInput = useRef(null);
-   const { auth, viewedUserOpenInfo } = useSelector((state: any) => state.firebase);
+   const { auth, viewedUserOpenInfo, isPublishing } = useSelector((state: any) => state.firebase);
    const [login, setLogin] = useState('');
    const [editorState, setEditorState] = useState<any>(EditorState.createEmpty());
    const [resultArticle, setResultArticle] = useState<any>('');
@@ -116,6 +118,7 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
    const [tags, setTags] = useState<any>([]);
    const [articleUrl, setArticleUrl] = useState('');
    const [resultUrl, setResultUrl] = useState('test');
+   const [mainBtnClicked, setMainBtnClicked] = useState(false);
 
    // При изменении текста в редакторе происходит преобразование текста в HTML код и выводится результат
    useEffect(() => {
@@ -143,6 +146,14 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
       })();
       // eslint-disable-next-line
    }, []);
+
+   useEffect(() => {
+      if (mainBtnClicked && !isPublishing) {
+         setMainBtnClicked(false);
+         history.push(Routes.userPageScreens.articles.replace(':login', login));
+      }
+      // eslint-disable-next-line
+   }, [mainBtnClicked, isPublishing]);
 
    // Преобразование добавленой картинки в Base64
    const getFileBase64 = (file: any, callback: any) => {
@@ -195,7 +206,7 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
                   dispatch(
                      publishArticle(
                         resultArticle,
-                        header,
+                        header.toUpperCase(),
                         annotation,
                         mainPhoto,
                         smallPhoto,
@@ -203,9 +214,12 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
                         tags,
                         resultUrl,
                         viewedUserOpenInfo.name + ' ' + viewedUserOpenInfo.surname,
-                        login
+                        login,
+                        null,
+                        isRedactor ? 'redactor' : 'user'
                      )
                   );
+                  setMainBtnClicked(true);
                },
                'blob'
             );
@@ -261,10 +275,16 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
 
    const rejectFunc = () => {};
 
-   const saveFunc = () => {};
-
    return (
       <div className={classNames(styles['editor-container'], className)}>
+         {isPublishing ? (
+            <AlertPopup
+               status="Alert"
+               setShowAlert={null}
+               isShow={isPublishing}
+               messageText={isRedactor ? 'Публикация статьи' : 'Отправка статьи редактору'}
+            />
+         ) : null}
          <div className={styles['switch-btns']}>
             <button
                onClick={() => setShowResult(false)}
@@ -472,9 +492,6 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
                <button onClick={rejectFunc} className={classNames(styles['btn'], styles['reject'])}>
                   Отмена
                </button>
-               <button onClick={saveFunc} className={classNames(styles['btn'], styles['save'])}>
-                  Сохранить
-               </button>
                <button type="submit" className={classNames(styles['btn'], styles['submit'])}>
                   Опубликовать
                </button>
@@ -557,5 +574,5 @@ const EditorArticle: React.FC<EditorArticleProps> = ({ className }) => {
 EditorArticle.defaultProps = {
    className: null
 };
-
-export default EditorArticle;
+// @ts-ignore
+export default withRouter(EditorArticle);

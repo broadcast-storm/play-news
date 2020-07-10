@@ -22,7 +22,7 @@ export function getViewedArticle(type, id) {
    return async (dispatch, getState) => {
       const { firebase } = getState();
       dispatch({ type: LOADING_ARTICLE_BEGIN });
-      if (type === 'article' || type === 'review' || type === 'news') {
+      if (type === 'articles' || type === 'reviews' || type === 'news') {
          const getArtilce = firebase.functions.httpsCallable('getArticle');
          const gettingArticleResult = await getArtilce({ type, id });
          if (gettingArticleResult.data.result === null) dispatch({ type: LOADING_ARTICLE_FAILED });

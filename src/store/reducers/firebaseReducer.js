@@ -31,7 +31,11 @@ const initialState = {
    viewedUserPhoto: null,
    userInfoUpdating: false,
    navbarInfoLoading: false,
-   navbarInfo: null
+   navbarInfo: null,
+   isPublishing: false,
+   isDeletingDraft: false,
+   isOpeningDraft: false,
+   draft: null
 };
 
 export const firebaseReducer = (state = initialState, action) => {
@@ -166,6 +170,36 @@ export const firebaseReducer = (state = initialState, action) => {
             ...state,
             userInfoUpdating: false,
             ...action.payload
+         };
+      case 'START_PUBLISHING':
+         return {
+            ...state,
+            isPublishing: true
+         };
+      case 'SUCCESS_FINISH_PUBLISHING':
+         return {
+            ...state,
+            isPublishing: false
+         };
+      case 'START_DELETING_DRAFT':
+         return {
+            ...state,
+            isDeletingDraft: true
+         };
+      case 'FINISH_DELETING_DRAFT':
+         return {
+            ...state,
+            isDeletingDraft: false
+         };
+      case 'START_LOADING_DRAFT':
+         return {
+            ...state,
+            isOpeningDraft: true
+         };
+      case 'FINISH_LOADING_DRAFT':
+         return {
+            ...state,
+            isOpeningDraft: false
          };
       default:
          return state;
