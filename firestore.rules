@@ -4,7 +4,8 @@ service cloud.firestore {
 
 
     match /{document=**} {
-      allow read, write: if request.auth.uid != null;
+      allow read: if true; 
+      allow write: if request.auth.uid != null;
     }
     match /loginsList/logins {
       allow read: if true;
@@ -16,6 +17,18 @@ service cloud.firestore {
     match /usersOpen/{login} {
       allow read: if true;
       allow write: if false;
+    }
+    match /comments/{id} {
+      allow read: if true;
+      allow write: if request.auth.token.login != null;
+    }
+    match /articles/{id} {
+      allow read: if true;
+      allow write: if request.auth.token.login != null;
+    }
+    match /articlesContent/{id} {
+      allow read: if true;
+      allow write: if request.auth.token.login != null;
     }
   }
 }

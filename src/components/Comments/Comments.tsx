@@ -61,7 +61,6 @@ const Comments: React.FC<CommentsProps> = ({
 
    useEffect(() => {
       if (inView) {
-         console.log('viewed!!!!!');
          dispatch(addView(articleId));
       }
       // eslint-disable-next-line

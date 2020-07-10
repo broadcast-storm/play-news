@@ -67,7 +67,6 @@ const Navbar: React.FC = () => {
                   </NavLink>
                   <Profile />
                </div>
-
                <button className={styles['nav-bar__menu-btn']} onClick={openMenuHandler}>
                   <img src={Menu} alt="Menu" />
                </button>

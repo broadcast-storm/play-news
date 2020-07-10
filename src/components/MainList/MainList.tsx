@@ -69,7 +69,6 @@ const MainList: React.FC<MainListProps> = ({ className, location, match, navbarI
             for (var i in docSnaps) {
                articles.push(docSnaps[i].data());
             }
-            console.log(articles);
             setItemsList(
                articles.sort(function(a, b) {
                   return b.date.seconds - a.date.seconds;

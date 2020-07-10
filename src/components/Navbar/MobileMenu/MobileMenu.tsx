@@ -42,10 +42,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen }) => {
                   Обзоры
                </NavLink>
                <NavLink
-                  to={Routes.favourites}
+                  to={Routes.infoPage}
                   className={classNames(styles['nav-bar__link'], styles['mobile-menu_mobile'])}
                   activeClassName={styles['link-active']}>
-                  Избранное
+                  О проекте
                </NavLink>
                <NavLink
                   to={Routes.favourites}
