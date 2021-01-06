@@ -23,7 +23,7 @@
       "algoliasearch": "^4.3.0",
       "antd": "^3.26.8",
       "autosize": "^4.0.2",
-      "axios": "^0.19.2",
+      "axios": "^0.21.1",
       "babel-plugin-import": "^1.13.0",
       "bootstrap": "^4.4.1",
       "classnames": "^2.2.6",
